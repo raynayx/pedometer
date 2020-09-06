@@ -1,0 +1,6 @@
+{
+    "board": "Intel:arc32:arduino_101",
+    "programmer": "AVRISP mkII",
+    "port": "COM4",
+    "sketch": "pedometer.ino"
+}
