@@ -19,7 +19,7 @@ void setup()
     Serial.begin(115200);
     // pinMode(upBtn,INPUT); //active low
     setupSensor(accelerometerRange,accelerometerRate);
-    calibrateAccel();
+    // calibrateAccel();
 
 }
 

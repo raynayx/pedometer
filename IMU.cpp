@@ -7,9 +7,9 @@ Step counter initial implementation
 #include "CurieIMU.h"
 
 
-float max_threshold,min_threshold, threshold = 0.55;  // dynamic threshold
+float max_threshold,min_threshold, threshold = 0.43;  // dynamic threshold
 float max_reading,min_reading;      // max and min of all 3 axes
-float precision = 0.2;                    // step counting precision
+float precision = 0.1;                    // step counting precision
 int sampling_counter = 0;
 float sample_new = 0.0,sample_old = 0.0;    //linear shift register
 float sample_result = 0.0;
@@ -75,10 +75,16 @@ int countStep()
     // read the sensor values from all axes and find the average of every four sets
     for (int i = 0; i < 4; i++)
     {
-        CurieIMU.readAccelerometerScaled(x,y,z);
-        x_new += abs(x);
-        y_new += abs(y);
-        z_new += abs(z); 
+        if(CurieIMU.dataReady(ACCEL))
+        {
+            CurieIMU.readAccelerometerScaled(x,y,z);
+            x_new += abs(x);
+            y_new += abs(y);
+            z_new += abs(z); 
+            delay(20); 
+        }
+        
+        
     }
     
     x_result = x_new/4;
