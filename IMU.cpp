@@ -7,12 +7,15 @@ Step counter initial implementation
 #include "CurieIMU.h"
 
 
-float max_threshold,min_threshold, threshold = 0.43;  // dynamic threshold
-float max_reading,min_reading;      // max and min of all 3 axes
-float precision = 0.1;                    // step counting precision
+float max_threshold,min_threshold, threshold = 0.23;  // dynamic threshold
+float thresholds[3];                //threshold for all 3 axes x,y,z in that order
+float max_reading[3],min_reading[3];      // max and min of all 3 axes
+float x_store[50],y_store[50],z_store[50];
+
+float precision = 0.2;                    // step counting precision
 int sampling_counter = 0;
-float sample_new = 0.0,sample_old = 0.0;    //linear shift register
-float sample_result = 0.0;
+float sample_new = 0,sample_old =0;    //linear shift register
+float sample_result[3];
 int steps = 0;   // number of steps
 
 void setupSensor(int accelRange, int accelRate)
@@ -20,6 +23,8 @@ void setupSensor(int accelRange, int accelRate)
     CurieIMU.begin();
     CurieIMU.setAccelerometerRange(accelRange);
     CurieIMU.setAccelerometerRate(accelRate);           //set accelerometer SAMPLING RATE
+
+
 }
 
 void calibrateAccel()
@@ -29,47 +34,51 @@ CurieIMU.autoCalibrateAccelerometerOffset(Y_AXIS, 0);
 CurieIMU.autoCalibrateAccelerometerOffset(Z_AXIS, 1);  
 }
 
-float maxVal(float x, float y, float z)
+float maxVal(float x[50])
 {
-     if(x > y && x > z)
-        {
-            return x;
-        }
-        else if(y > x && y > z)
-        {
-            return y;
-        }
-        else if(z > x && z > y)
-        {
-            return z;
-        }
-        // return any if all are equal
+float max = x[0];
+ for (int i = 0; i < 50; i++)
+ {
+    if(x[i] > max)
+    {
+        max = x[i];
+    }
+ }
+ return max;
 }
 
-float minVal(float x, float y, float z)
+float maxVal2(float x[3])
 {
-     if(x < y && x < z)
-        {
-            return x;
-        }
-        else if(y < x && y < z)
-        {
-            return y;
-        }
-        else if(z < x && z < y)
-        {
-            return z;
-        }
+float max = x[0];
+ for (int i = 0; i < 3; i++)
+ {
+    if(x[i] > max)
+    {
+        max = x[i];
+    }
+ }
+ return max;
+}
 
-        // return any if all are equal
+float minVal(float x[50])
+{
+float min = x[0];
+ for (int i = 0; i < 50; i++)
+ {
+    if(x[i] < min)
+    {
+        min = x[i];
+    }
+ }
+ return min;
 }
 
 int countStep()
 {
-    float x,y,z;                          //accelerometer readings
-    float x_result,y_result,z_result;     // digital filter: just an average of 4 successive readings
-    float x_new = 0,y_new = 0,z_new = 0;  //current readings
-    float delta;                //difference between threshold and sample_result
+    float readings[3];                          //accelerometer readings
+    float results[3];     // digital filter: just an average of 4 successive readings
+    float new_readings[3] = {0.0,0.0,0.0};  //current readings
+    float delta[3];                //difference between threshold and sample_result
 
 
     // read the sensor values from all axes and find the average of every four sets
@@ -77,49 +86,83 @@ int countStep()
     {
         if(CurieIMU.dataReady(ACCEL))
         {
-            CurieIMU.readAccelerometerScaled(x,y,z);
-            x_new += abs(x);
-            y_new += abs(y);
-            z_new += abs(z); 
+            CurieIMU.readAccelerometerScaled(readings[0],readings[1],readings[2]);
+            for(int i = 0; i < 3;i++)
+            {
+                new_readings[i] += abs(readings[i]);
+            } 
             delay(20); 
         }
         
         
     }
     
-    x_result = x_new/4;
-    y_result = y_new/4;
-    z_result = z_new/4;
+    for(int i = 0; i < 3; i++)
+    {
+        results[i] = new_readings[i]/4;
+    }
 
+   
+    x_store[sampling_counter] = results[0];
+    y_store[sampling_counter] = results[1];
+    z_store[sampling_counter] = results[2];
+
+    
 //    Serial.print("A \t");
-    Serial.print(abs(x_result));
-    Serial.print("\t");
-    Serial.print(abs(y_result));
-    Serial.print("\t");
-    Serial.println(abs(z_result));
+    for(int i = 0; i < 3; i++)
+    {
+        Serial.print(abs(results[i]));
+        Serial.print("\t");
+    }
     Serial.print("counter\t");
     Serial.println(sampling_counter);
-    Serial.print("max_reading \t");
-    Serial.println(max_reading);
-    Serial.print("min_reading\t");
-    Serial.println(min_reading);
-    Serial.print("threshold\t");
-    Serial.println(threshold);
+
+    for(int i = 0; i < 3;i++)
+    {
+        Serial.print("max_reading \t");
+        Serial.println(max_reading[i]);
+        Serial.print("min_reading\t");
+        Serial.println(min_reading[i]);
+    }
+    
+    for(int i = 0; i <3; i++)
+    {
+        Serial.print("threshold\t");
+        Serial.println(thresholds[i]);
+    }
+   
     Serial.print("Steps\t");
     Serial.println(steps);
+
+    Serial.print("sample_new\t");
+    Serial.println(sample_new);
+
+    Serial.print("sample_old\t");
+    Serial.println(sample_old);
+
+    Serial.print("delta\t");
+    Serial.println(maxVal2(delta));
+
+    Serial.print("precision\t");
+    Serial.println(precision);
+
 //    Serial.println(CurieIMU.getAccelerometerRate());    DEFAULT SAMPLING RATE IS 100 Hz
 
     if(sampling_counter == 0)
     {
-
-    
         // getting the maximum reading across all 3 axes
-       max_reading = maxVal(x_result,y_result,z_result);
+        max_reading[0] = maxVal(x_store);
+        max_reading[1] = maxVal(y_store);
+        max_reading[2] = maxVal(z_store);
 
         // getting the minimum reading across all 3 axes
-        min_reading = minVal(x_result,y_result,z_result);
+        min_reading[0] = minVal(x_store);
+        min_reading[1] = minVal(y_store);
+        min_reading[2] = minVal(z_store);
 
-        threshold = (max_reading + min_reading)/2;          //compute dynamic threshold
+        thresholds[0] = (max_reading[0] + min_reading[0])/2;          //compute dynamic threshold
+        thresholds[1] = (max_reading[1] + min_reading[1])/2;
+        thresholds[2] = (max_reading[2] + min_reading[2])/2;
     }
     sampling_counter++;
 
@@ -129,12 +172,19 @@ int countStep()
 
         // reinitiate the max and min threshold values
         // getting the maximum reading across all 3 axes
-        max_reading = maxVal(x_result,y_result,z_result);
+       // getting the maximum reading across all 3 axes
+        max_reading[0] = maxVal(x_store);
+        max_reading[1] = maxVal(y_store);
+        max_reading[2] = maxVal(z_store);
 
         // getting the minimum reading across all 3 axes
-        min_reading = minVal(x_result,y_result,z_result);
+        min_reading[0] = minVal(x_store);
+        min_reading[1] = minVal(y_store);
+        min_reading[2] = minVal(z_store);
 
-        threshold = (max_reading + min_reading)/2;          //compute dynamic threshold
+        thresholds[0] = (max_reading[0] + min_reading[0])/2;          //compute dynamic threshold
+        thresholds[1] = (max_reading[1] + min_reading[1])/2;
+        thresholds[2] = (max_reading[2] + min_reading[2])/2;
     }
 
     // finding the changes in acceleration and comparing it with the preset value
@@ -142,20 +192,37 @@ int countStep()
     // shift sample_result to sample_new if:
     //  delta in acceleration is greater than predefined precision
     // else sample_new is unchanged
-    sample_result = maxVal(x_result,y_result,z_result); 
 
-    sample_old = sample_new;
-    delta = threshold - sample_result;      //change sufficient? 
-    if(delta > precision)
+    
+    for(int i = 0; i < 3; i++)
     {
-       sample_new = sample_result;
-       Serial.println("delta greater than precision");
+        sample_result[i] = max_reading[i];
+        delta[i] = thresholds[i] - sample_result[i];
+        
     }
     
-    if(sample_new < sample_old)
+
+    if(abs(maxVal2(delta)) > precision)
     {
-        steps++;
+        sample_new = maxVal2(sample_result);
+        Serial.println("delta greater than precision");
+        if(sample_new < sample_old)
+        {
+            steps++;
+        }
+ 
     }
+    
+    sample_old = sample_new;
+    
+
+    
     return steps;
 }
 
+
+
+
+
+
+// from CurieIMU library
