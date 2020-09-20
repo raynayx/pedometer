@@ -1,11 +1,35 @@
 /*
 Step counter initial implementation
 
+###########################LSM9DS1 IMU CONNECTION OVER I2C ##########################################
+
+    LSM9DS1 --------- Arduino
+   SCL ---------- SCL (A5 on older 'Duinos')
+   SDA ---------- SDA (A4 on older 'Duinos')
+   VDD ------------- 3.3V
+   GND ------------- GND
+
+####################################################################################################
+
 
 */
 #include "IMU.h"
-#include "CurieIMU.h"
+#include <Wire.h>
+#include <SparkFunLSM9DS1.h> 
 
+// IMU settings
+#define PRINT_CALCULATED
+#define PRINT_SPEED 250 // 250 ms between prints
+static unsigned long lastPrint = 0; // Keep track of print time
+
+#define DECLINATION -8.58
+
+void printGyro();
+void printAccel();
+void printMag();
+void printAttitude(float ax, float ay, float az, float mx, float my, float mz);
+
+LSM9DS1 imu;
 
 float max_threshold,min_threshold, threshold = 0.23;  // dynamic threshold
 float thresholds[3];                //threshold for all 3 axes x,y,z in that order
@@ -20,18 +44,16 @@ int steps = 0;   // number of steps
 
 void setupSensor(int accelRange, int accelRate)
 {
-    CurieIMU.begin();
-    CurieIMU.setAccelerometerRange(accelRange);
-    CurieIMU.setAccelerometerRate(accelRate);           //set accelerometer SAMPLING RATE
+//    CurieIMU.begin();
+//    CurieIMU.setAccelerometerRange(accelRange);
+//    CurieIMU.setAccelerometerRate(accelRate);           //set accelerometer SAMPLING RATE
 
 
 }
 
 void calibrateAccel()
 {
-CurieIMU.autoCalibrateAccelerometerOffset(X_AXIS, 0);
-CurieIMU.autoCalibrateAccelerometerOffset(Y_AXIS, 0);
-CurieIMU.autoCalibrateAccelerometerOffset(Z_AXIS, 1);  
+// calibrate sensor  
 }
 
 float maxVal(float x[50])
@@ -84,9 +106,9 @@ int countStep()
     // read the sensor values from all axes and find the average of every four sets
     for (int i = 0; i < 4; i++)
     {
-        if(CurieIMU.dataReady(ACCEL))
+        if(1) //check for accel data availability from sensor
         {
-            CurieIMU.readAccelerometerScaled(readings[0],readings[1],readings[2]);
+//            CurieIMU.readAccelerometerScaled(readings[0],readings[1],readings[2]);      Read x,y,z from accel sensor
             for(int i = 0; i < 3;i++)
             {
                 new_readings[i] += abs(readings[i]);
@@ -225,4 +247,142 @@ int countStep()
 
 
 
-// from CurieIMU library
+// from LSM9DS1 library
+void printGyro()
+{
+  // Now we can use the gx, gy, and gz variables as we please.
+  // Either print them as raw ADC values, or calculated in DPS.
+  Serial.print("G: ");
+  
+#ifdef PRINT_CALCULATED
+  // If you want to print calculated values, you can use the
+  // calcGyro helper function to convert a raw ADC value to
+  // DPS. Give the function the value that you want to convert.
+  Serial.print(imu.calcGyro(imu.gx), 2);
+  Serial.print(", ");
+  Serial.print(imu.calcGyro(imu.gy), 2);
+  Serial.print(", ");
+  Serial.print(imu.calcGyro(imu.gz), 2);
+  Serial.println(" deg/s");
+
+   // print to OLED screen 
+//  oled.print(imu.calcGyro(imu.gx), 2);
+//  oled.print(", ");
+//  oled.print(imu.calcGyro(imu.gy), 2);
+//  oled.print(", ");
+//  oled.print(imu.calcGyro(imu.gz), 2);
+//  oled.println(" deg/s");
+#elif defined PRINT_RAW
+  Serial.print(imu.gx);
+  Serial.print(", ");
+  Serial.print(imu.gy);
+  Serial.print(", ");
+  Serial.println(imu.gz);
+
+
+// oled.print(imu.gx);
+//  oled.println(", ");
+//  oled.print(imu.gy);
+//  oled.println(", ");
+//  oled.println(imu.gz);
+#endif
+}
+
+
+void printAccel()
+{
+  // Now we can use the ax, ay, and az variables as we please.
+  // Either print them as raw ADC values, or calculated in g's.
+  Serial.print("A: ");
+//  oled.println("A: ");
+#ifdef PRINT_CALCULATED
+  // If you want to print calculated values, you can use the
+  // calcAccel helper function to convert a raw ADC value to
+  // g's. Give the function the value that you want to convert.
+  Serial.print(imu.calcAccel(imu.ax), 2);
+  Serial.print(", ");
+  Serial.print(imu.calcAccel(imu.ay), 2);
+  Serial.print(", ");
+  Serial.print(imu.calcAccel(imu.az), 2);
+  Serial.println(" g");
+
+
+//  oled.println(imu.calcAccel(imu.ax), 2);
+//  oled.println(imu.calcAccel(imu.ay), 2);
+//  oled.print(imu.calcAccel(imu.az), 2);
+//  oled.println(" g");
+//  oled.println();
+//  oled.println();
+//  oled.println();
+//  oled.println();
+
+  
+#elif defined PRINT_RAW
+  Serial.print(imu.ax);
+  Serial.print(", ");
+  Serial.print(imu.ay);
+  Serial.print(", ");
+  Serial.println(imu.az);
+
+  oled.print(imu.ax);
+  oled.println(", ");
+  oled.print(imu.ay);
+  oled.println(", ");
+  oled.println(imu.az);
+#endif
+
+}
+
+void printMag()
+{
+  // Now we can use the mx, my, and mz variables as we please.
+  // Either print them as raw ADC values, or calculated in Gauss.
+  Serial.print("M: ");
+#ifdef PRINT_CALCULATED
+  // If you want to print calculated values, you can use the
+  // calcMag helper function to convert a raw ADC value to
+  // Gauss. Give the function the value that you want to convert.
+  Serial.print(imu.calcMag(imu.mx), 2);
+  Serial.print(", ");
+  Serial.print(imu.calcMag(imu.my), 2);
+  Serial.print(", ");
+  Serial.print(imu.calcMag(imu.mz), 2);
+  Serial.println(" gauss");
+#elif defined PRINT_RAW
+  Serial.print(imu.mx);
+  Serial.print(", ");
+  Serial.print(imu.my);
+  Serial.print(", ");
+  Serial.println(imu.mz);
+#endif
+}
+
+
+
+void printAttitude(float ax, float ay, float az, float mx, float my, float mz)
+{
+    float roll = atan2(ay, az);
+    float pitch = atan2(-ax, sqrt(ay * ay + az * az));
+
+    float heading;
+  if (my == 0)
+    heading = (mx < 0) ? PI : 0;
+  else
+    heading = atan2(mx, my);
+
+  heading -= DECLINATION * PI / 180;
+
+  if (heading > PI) heading -= (2 * PI);
+  else if (heading < -PI) heading += (2 * PI);
+
+  // Convert everything from radians to degrees:
+  heading *= 180.0 / PI;
+  pitch *= 180.0 / PI;
+  roll  *= 180.0 / PI;
+
+  Serial.print("Pitch, Roll: ");
+  Serial.print(pitch, 2);
+  Serial.print(", ");
+  Serial.println(roll, 2);
+  Serial.print("Heading: "); Serial.println(heading, 2);
+}

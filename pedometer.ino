@@ -1,91 +1,70 @@
 /*
 pedometer glue
 
+#########Button Screen Interaction #####################
+
+
+
+#######################################################
+
+
+
 
 */
 #include "UI.h"
 #include "IMU.h"
 
-#include "CurieIMU.h"
-
 #define accelerometerRange 2
 #define accelerometerRate 50
 
-#define backlightTime 1000
 
-const int upBtn = 4; 
+// BUTTON SETUP; TWO BUTTONS: ONE FOR NAVIGATION; THE OTHER FOR SELECTION
+const int navBtn = 8;
+const int selBtn = 10;
 
+int navBtnState;
+int navBtnStateLast = LOW;
 
-boolean stepEventsEnabeled = false;   
-long lastStepCount = 0;
+int selBtnState;
+int selBtnStateLast = LOW;
+
+unsigned long lastDebounceTime = 0;
+unsigned long debounceDelay = 50;
 
 void setup()
 {
-    setupScreen();
     Serial.begin(115200);
-    // pinMode(upBtn,INPUT); //active low
-    setupSensor(accelerometerRange,accelerometerRate);
-    // calibrateAccel();
-
     
-    // from CurieIMU library
-    CurieIMU.setStepDetectionMode(CURIE_IMU_STEP_MODE_NORMAL);
-    // enable step counting:
-    CurieIMU.setStepCountEnabled(true);
-
-    if (stepEventsEnabeled) {
-    // attach the eventCallback function as the
-    // step event handler:
-    CurieIMU.attachInterrupt(eventCallback);
-    CurieIMU.interrupts(CURIE_IMU_STEP);  // turn on step detection
-
-    Serial.println("IMU initialisation complete, waiting for events...");
-  }
+    pinMode(navBtn,INPUT);
+    pinMode(selBtn,INPUT);
+    
+    setupScreen();
+    welcomeScreen();
+    
 
 }
 
 void loop()
 {
-//    welcomeScreen();
-    countStep();
-    //  delay(550);
-    
-
-    Serial.println();
-
-
-     if (!stepEventsEnabeled) {
-    updateStepCount();
+  menu();
+  
+  int readNavBtn = digitalRead(navBtn);
+  int readSelBtn = digitalRead(selBtn);
+  
+  if(readNavBtn)
+  {
+    delay(150);
+    moveMenu(); 
+    goHome();
   }
+  if(readSelBtn)
+  {
+    delay(150);
+    switchPage();
+//    delay(10000);
      
-    // turnOff();
-    // delay(10000);
-    // turnOn();
-
-    // if(upBtn == HIGH)
-    // {
-    //   Serial.println("pressed");
-    //   backlight();
-    //   // start coutdown to turnOff the light
-    // }
-    
-}
-
-
-static void eventCallback(void) {
-  if (CurieIMU.stepsDetected())
-    updateStepCount();
-}
-
-static void updateStepCount() {
-  // get the step count:
-  int stepCount = CurieIMU.getStepCount();
-
-  // if the step count has changed, print it:
-  if (stepCount != lastStepCount) {
-    Serial.print("Step count: ");
-    Serial.println(stepCount);
-    // save the current count for comparison next check:
-    lastStepCount = stepCount;
   }
+
+
+    
 }

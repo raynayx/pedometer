@@ -1,6 +1,7 @@
 {
-    "board": "Intel:arc32:arduino_101",
+    "board": "arduino:avr:pro",
     "programmer": "AVRISP mkII",
     "port": "COM4",
-    "sketch": "pedometer.ino"
+    "sketch": "pedometer.ino",
+    "configuration": "cpu=16MHzatmega328"
 }

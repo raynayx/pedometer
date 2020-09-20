@@ -1,12 +1,33 @@
+/*
+
+
+###############################OLED CONNECTIONS OVER SPI ############################################
+      MicroOLED ------------- Arduino
+      GND ------------------- GND
+      VDD ------------------- 3.3V (VCC)
+      D1/MOSI ----------------- D11 (don't change)
+      D0/SCK ------------------ D13 (don't change)
+      D2
+      D/C ------------------- D3 (can be any digital pin)
+      RST ------------------- D4 (can be any digital pin)
+      CS  ------------------- D5 (can be any digital pin)
+######################################################################################################
+
+
+
+*/
+
 #pragma once
-#include <Wire.h>
-#include "rgb_lcd.h" //Screen library replace with OLED part library
+#include <SPI.h> 
+#include <SFE_MicroOLED.h>  //OLED Screen library 
 #include <Arduino.h>
 
 
-
+enum class menuItem {steps,rawData,off};
+enum class page {home,steps,rawData};
 void setupScreen();
 void welcomeScreen();
-void turnOff();
-void turnOn();
-void backlight();
+void menu();
+void moveMenu();
+void switchPage();
+void goHome();
