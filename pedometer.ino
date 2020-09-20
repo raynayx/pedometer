@@ -37,6 +37,8 @@ void setup()
     
     pinMode(navBtn,INPUT);
     pinMode(selBtn,INPUT);
+
+    setupSensor();
     
     setupScreen();
     welcomeScreen();
@@ -61,10 +63,7 @@ void loop()
   {
     delay(150);
     switchPage();
-//    delay(10000);
-     
   }
-
-
+  refreshPage();
     
 }

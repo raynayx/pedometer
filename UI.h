@@ -23,6 +23,7 @@
 #include <Arduino.h>
 
 
+
 enum class menuItem {steps,rawData,off};
 enum class page {home,steps,rawData};
 void setupScreen();
@@ -30,4 +31,5 @@ void welcomeScreen();
 void menu();
 void moveMenu();
 void switchPage();
+void refreshPage();
 void goHome();

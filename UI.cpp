@@ -1,4 +1,5 @@
 #include "UI.h"
+#include "IMU.h"
 
 // OLED over SPI
 #define PIN_RESET 4 
@@ -41,9 +42,9 @@ void menu()
         oled.setCursor(4,2);
         oled.println("STEPS");
         oled.setCursor(4,12);
-        oled.println("RAWDATA");
+        oled.println("RAW DATA");
         oled.setCursor(4,22);
-        oled.println("OFF");
+        oled.println("HELP");
         oled.display(); 
         
         break;
@@ -55,9 +56,9 @@ void menu()
         oled.println("STEPS");
         oled.rect(0, 10, LCDWIDTH,11);
         oled.setCursor(4,12);
-        oled.println("RAWDATA");
+        oled.println("RAW DATA");
         oled.setCursor(4,22);
-        oled.println("OFF");
+        oled.println("HELP");
         oled.display(); 
     
         break;
@@ -67,10 +68,10 @@ void menu()
         oled.setCursor(4,2);
         oled.println("STEPS");
         oled.setCursor(4,12);
-        oled.println("RAWDATA");
+        oled.println("RAW DATA");
         oled.rect(0, 20, LCDWIDTH,11);
         oled.setCursor(4,22);
-        oled.println("OFF");
+        oled.println("HELP");
         oled.display(); 
     
         break;     
@@ -102,7 +103,7 @@ void moveMenu()
   }
 }
 
-void stepsPage()
+void stepsPage(long steps)
 {
   oled.clear(PAGE);
         oled.rect(0, 0, LCDWIDTH,LCDHEIGHT);
@@ -111,24 +112,26 @@ void stepsPage()
         oled.setCursor(2,10);
         oled.println("STEPS:");
         oled.setCursor(2,20);
-        oled.println(124);
+        oled.println(steps);
         oled.display(); 
 }
 
 
-void rawDataPage()
+void rawDataPage(float x, float y, float z)
 {
         oled.clear(PAGE);
         oled.rect(0, 0, LCDWIDTH,LCDHEIGHT);
         oled.setCursor(2,2);
-        oled.println("A: x, y, z");
+        oled.println("Accel");
         oled.setCursor(2,10);
-        oled.print("   ");
-        oled.print(2);
-        oled.print(", ");
-        oled.print(5);
-        oled.print(", ");
-        oled.print(1);
+        oled.print("x ");
+        oled.println(x);
+        oled.setCursor(2,20);
+        oled.print("y ");
+        oled.println(y);
+        oled.setCursor(2,30);
+        oled.print("z ");
+        oled.println(z);
         oled.display(); 
 }
 
@@ -138,13 +141,15 @@ void switchPage()
       {
         // switch to steps page
         currentPage = page::steps;
-        stepsPage();
+        stepsPage(1000000);
+        
       }
       else if(selection == menuItem::rawData)
       {
         // switch to raw data page
         currentPage = page::rawData;
-        rawDataPage();
+        refreshPage(); 
+        
       }
       else
       {
@@ -155,6 +160,19 @@ void switchPage()
     
     
 }
+ void refreshPage()
+{
+    axes a;
+  if (currentPage == page::rawData)
+  {
+    a = printAccel();
+    rawDataPage(a.x,a.y,a.z);
+    Serial.println("page being refreshed");
+    Serial.print(a.x);
+    Serial.print(a.y);
+    Serial.print(a.z);
+  }
+}
 
 void goHome()
 {
@@ -162,9 +180,5 @@ void goHome()
   {
      menu();
      currentPage = page::home;
-  }
-  else
-  {
-    return;
   }
 }
