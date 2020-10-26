@@ -1,4 +1,4 @@
-/*
+ /*
 
 
 ###############################OLED CONNECTIONS OVER SPI ############################################
@@ -8,9 +8,9 @@
       D1/MOSI ----------------- D11 (don't change)
       D0/SCK ------------------ D13 (don't change)
       D2
-      D/C ------------------- D3 (can be any digital pin)
-      RST ------------------- D4 (can be any digital pin)
-      CS  ------------------- D5 (can be any digital pin)
+      D/C ------------------- D8 (can be any digital pin)
+      RST ------------------- D9 (can be any digital pin)
+      CS  ------------------- D10 (can be any digital pin)
 ######################################################################################################
 
 
@@ -33,3 +33,4 @@ void moveMenu();
 void switchPage();
 void refreshPage();
 void goHome();
+

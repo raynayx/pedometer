@@ -2,9 +2,9 @@
 #include "IMU.h"
 
 // OLED over SPI
-#define PIN_RESET 4 
-#define PIN_DC    3  
-#define PIN_CS    5
+#define PIN_RESET 9  //4 
+#define PIN_DC    8  //3
+#define PIN_CS    10  //5
 
 MicroOLED oled(PIN_RESET, PIN_DC, PIN_CS);
 
@@ -21,6 +21,7 @@ void setupScreen()
 
 void welcomeScreen()
 {
+    Serial.println("PEDO");
     oled.println("PEDOMETER");
     oled.println("v 0.0.1");
     oled.println("2020");
@@ -141,7 +142,7 @@ void switchPage()
       {
         // switch to steps page
         currentPage = page::steps;
-        stepsPage(1000000);
+        stepsPage(countStep());
         
       }
       else if(selection == menuItem::rawData)

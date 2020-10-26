@@ -19,24 +19,24 @@ pedometer glue
 
 
 // BUTTON SETUP; TWO BUTTONS: ONE FOR NAVIGATION; THE OTHER FOR SELECTION
-const int navBtn = 8;
-const int selBtn = 10;
+const uint8_t navBtn = 2;
+const uint8_t selBtn = 3;
 
-int navBtnState;
-int navBtnStateLast = LOW;
+uint8_t navBtnState;
+uint8_t navBtnStateLast = LOW;
 
-int selBtnState;
-int selBtnStateLast = LOW;
+uint8_t selBtnState;
+uint8_t selBtnStateLast = LOW;
 
-unsigned long lastDebounceTime = 0;
-unsigned long debounceDelay = 50;
+//unsigned long lastDebounceTime = 0;
+//unsigned long debounceDelay = 50;
 
 void setup()
 {
     Serial.begin(115200);
     
-    pinMode(navBtn,INPUT);
-    pinMode(selBtn,INPUT);
+    pinMode(navBtn,INPUT_PULLUP);
+    pinMode(selBtn,INPUT_PULLUP);
 
     setupSensor();
     
@@ -50,20 +50,21 @@ void loop()
 {
   menu();
   
-  int readNavBtn = digitalRead(navBtn);
-  int readSelBtn = digitalRead(selBtn);
+  uint8_t readNavBtn = digitalRead(navBtn);
+  uint8_t readSelBtn = digitalRead(selBtn);
   
-  if(readNavBtn)
+  if(!readNavBtn)
   {
     delay(150);
     moveMenu(); 
     goHome();
   }
-  if(readSelBtn)
+  if(!readSelBtn)
   {
     delay(150);
     switchPage();
   }
   refreshPage();
+  Serial.println(countStep());
     
 }
