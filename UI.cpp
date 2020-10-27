@@ -173,6 +173,10 @@ void switchPage()
     Serial.print(a.y);
     Serial.print(a.z);
   }
+  if (currentPage == page::steps)
+  {
+    stepsPage(countStep());
+  }
 }
 
 void goHome()

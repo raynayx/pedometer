@@ -30,8 +30,10 @@ LSM9DS1 imu;
 long steps = 0;   // number of steps
 axes stored_reading[50];
 int sampling_counter = 0; 
-float precision = 0.1;
-axes threshold = {0.1,0.1,0.1};
+float precision = 0.5;
+axes threshold = {0.6,0.6,0.6};
+float sample_new = 0;
+float sample_old = 0;
 //####################################
 
 
@@ -64,13 +66,11 @@ void setupSensor()
 long countStep()
 {
 axes reading = {0,0,0};   // result after digital filter       
-axes maxSample;        //maximum of 3 axes
-axes minSample;         // minimum of 3 axes
+axes maxSample = {0.1,0.3,0.9};        //maximum of 3 axes
+axes minSample = {0.0,0.0,0.2};         // minimum of 3 axes
 
 axes delta;
-float sample_new;
-float sample_old;
-axes sample_result;
+
   
  if (imu.accelAvailable())
   { 
@@ -91,17 +91,11 @@ reading.z = reading.z/4;
 stored_reading[sampling_counter] = reading;
 sampling_counter++;
 
-
  if(sampling_counter == 50)
  {
    sampling_counter = 0;
-   axes maxSample = maxVal(stored_reading);
-   axes minSample = minVal(stored_reading);
-
-
-   // reinitiate max and min
-   //set Dynamic precision when sampling_counter == 0
-
+   maxSample = maxVal(stored_reading);
+   minSample = minVal(stored_reading);
    //finding dynamic threhold
   threshold.x = (maxSample.x + minSample.x)/2;
   threshold.y = (maxSample.y + minSample.y)/2;
@@ -114,26 +108,22 @@ sampling_counter++;
  // delta in acceleration is greater than predefined precision
  // else sample_new is unchanged
 
-sample_result = maxSample;
 
-delta.x = threshold.x - sample_result.x;
-delta.y = threshold.y - sample_result.y;
-delta.z = threshold.z - sample_result.z;
+delta.x = threshold.x - abs(reading.x);
+delta.y = threshold.y - abs(reading.y);
+delta.z = threshold.z - abs(reading.z);
 
 //find greatest delta
-float maxDelta = maxAxis(delta);
 sample_old = sample_new;
 
-if(maxDelta > precision) 
+if(maxAxis(delta) > precision) 
 {
-  sample_new = maxAxis(sample_result);
-
+  sample_new = maxAxis(reading); //sample_result
   if(sample_new < sample_old)
   {
     steps++;
   }
 }
-
 
 return steps;
 
@@ -190,50 +180,50 @@ void myWait(int interval)
 
 axes maxVal(axes arr[50])
 {
-      float X = arr[0].x;
-      float Y = arr[0].y;
-      float Z = arr[0].z;
+      float X = abs(arr[0].x);
+      float Y = abs(arr[0].y);
+      float Z = abs(arr[0].z);
 
       for (int i = 0; i < 50; i++)
       {
-            if(arr[i].x > X)
+            if(abs(arr[i].x) > X)
             {
-            X = arr[i].x;
+            X = abs(arr[i].x);
             }
 
-            if(arr[i].y > Y )
+            if(abs(arr[i].y) > Y )
             {
-            Y = arr[i].y;
+            Y = abs(arr[i].y);
             }
 
-            if(arr[i].z > Z)
+            if(abs(arr[i].z) > Z)
             {
-            Z = arr[i].z;
+            Z = abs(arr[i].z);
             }
       }
       return {X,Y,Z};
 }
 axes minVal(axes arr[50])
 {
-      float X = arr[0].x;
-      float Y = arr[0].y;
-      float Z = arr[0].z;
+      float X = abs(arr[0].x);
+      float Y = abs(arr[0].y);
+      float Z = abs(arr[0].z);
 
       for (int i = 0; i < 50; i++)
       {
-            if(arr[i].x < X)
+            if(abs(arr[i].x) < X)
             {
-            X = arr[i].x;
+            X = abs(arr[i].x);
             }
 
-            if(arr[i].y < Y )
+            if(abs(arr[i].y) < Y )
             {
-            Y = arr[i].y;
+            Y = abs(arr[i].y);
             }
 
-            if(arr[i].z < Z)
+            if(abs(arr[i].z) < Z)
             {
-            Z = arr[i].z;
+            Z = abs(arr[i].z);
             }
       }
       return {X,Y,Z};
