@@ -14,22 +14,10 @@ pedometer glue
 #include "UI.h"
 #include "IMU.h"
 
-#define accelerometerRange 2
-#define accelerometerRate 50
-
 
 // BUTTON SETUP; TWO BUTTONS: ONE FOR NAVIGATION; THE OTHER FOR SELECTION
 const uint8_t navBtn = 2;
 const uint8_t selBtn = 3;
-
-uint8_t navBtnState;
-uint8_t navBtnStateLast = LOW;
-
-uint8_t selBtnState;
-uint8_t selBtnStateLast = LOW;
-
-//unsigned long lastDebounceTime = 0;
-//unsigned long debounceDelay = 50;
 
 void setup()
 {
@@ -55,15 +43,23 @@ void loop()
   
   if(!readNavBtn)
   {
-    delay(150);
-    moveMenu(); 
-    goHome();
+    myWait(100);
+    if(!readNavBtn)
+    {
+      moveMenu(); 
+      goHome();
+    }
   }
+  
   if(!readSelBtn)
   {
-    delay(150);
-    switchPage();
+    myWait(100);
+    if(!readSelBtn)
+    {
+      switchPage();
+    }
   }
+  
   refreshPage();
   Serial.println(countStep());
     
