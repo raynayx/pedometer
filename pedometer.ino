@@ -61,6 +61,6 @@ void loop()
   }
   
   refreshPage();
-  Serial.println(countStep());
+//  Serial.println(countStep());
     
 }

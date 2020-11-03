@@ -30,10 +30,11 @@ LSM9DS1 imu;
 long steps = 0;   // number of steps
 axes stored_reading[50];
 int sampling_counter = 0; 
-float precision = 0.5;
+float precision = 0.7;
 axes threshold = {0.6,0.6,0.6};
 float sample_new = 0;
 float sample_old = 0;
+unsigned long timeOfPreviousStep = 0;
 //####################################
 
 
@@ -115,13 +116,27 @@ delta.z = threshold.z - abs(reading.z);
 
 //find greatest delta
 sample_old = sample_new;
+Serial.println(maxAxis(delta));
 
 if(maxAxis(delta) > precision) 
 {
+  Serial.println("**");
   sample_new = maxAxis(reading); //sample_result
-  if(sample_new < sample_old)
+  
+  if(sample_new < sample_old - 0.1)
   {
-    steps++;
+    Serial.print("new \t");
+    Serial.println(sample_new,6);
+    
+    Serial.print("old \t");
+    Serial.println(sample_old,6);
+    
+    if(millis() - timeOfPreviousStep  > 200)
+    {
+      timeOfPreviousStep = millis();
+      Serial.println("##");
+      steps++;
+    }
   }
 }
 
@@ -148,12 +163,12 @@ axes printAccel()
   a.y = imu.calcAccel(imu.ay);
   a.z = imu.calcAccel(imu.az);
   
-  Serial.print(a.x);
-  Serial.print(", ");
-  Serial.print(a.y);
-  Serial.print(", ");
-  Serial.print(a.z);
-  Serial.println(" g");
+//  Serial.print(a.x);
+//  Serial.print(", ");
+//  Serial.print(a.y);
+//  Serial.print(", ");
+//  Serial.print(a.z);
+//  Serial.println(" g");
 
   
 #elif defined PRINT_RAW
@@ -161,11 +176,11 @@ if ( imu.accelAvailable() )
   {
     imu.readAccel();
   }
-  Serial.print(imu.ax);
-  Serial.print(", ");
-  Serial.print(imu.ay);
-  Serial.print(", ");
-  Serial.println(imu.az);
+//  Serial.print(imu.ax);
+//  Serial.print(", ");
+//  Serial.print(imu.ay);
+//  Serial.print(", ");
+//  Serial.println(imu.az);
 
 
 #endif
