@@ -21,10 +21,10 @@ void setupScreen()
 
 void welcomeScreen()
 {
-    Serial.println("PEDO");
-    oled.println("PEDOMETER");
-    oled.println("v 0.0.1");
-    oled.println("2020");
+    Serial.println(F("PEDO"));
+    oled.println(F("PEDOMETER"));
+    oled.println(F("v 0.0.1"));
+    oled.println(F("2020"));
     oled.display();
     oled.setCursor(0,0);
     delay(1500);
@@ -33,6 +33,10 @@ void welcomeScreen()
 
 void menu()
 {
+     String steps = F("STEPS");
+     String raw_data = F("RAW DATA");
+     String help = F("HELP");
+     
      if (currentPage != page::home)
       return;
      switch (selection)
@@ -41,11 +45,11 @@ void menu()
         oled.clear(PAGE);
         oled.rect(0, 0, LCDWIDTH,11);
         oled.setCursor(4,2);
-        oled.println("STEPS");
+        oled.println(steps);
         oled.setCursor(4,12);
-        oled.println("RAW DATA");
+        oled.println(raw_data);
         oled.setCursor(4,22);
-        oled.println("HELP");
+        oled.println(help);
         oled.display(); 
         
         break;
@@ -54,12 +58,12 @@ void menu()
      case menuItem::rawData:
         oled.clear(PAGE);
         oled.setCursor(4,2);
-        oled.println("STEPS");
+        oled.println(steps);
         oled.rect(0, 10, LCDWIDTH,11);
         oled.setCursor(4,12);
-        oled.println("RAW DATA");
+        oled.println(raw_data);
         oled.setCursor(4,22);
-        oled.println("HELP");
+        oled.println(help);
         oled.display(); 
     
         break;
@@ -67,12 +71,12 @@ void menu()
     case menuItem::off:
         oled.clear(PAGE);
         oled.setCursor(4,2);
-        oled.println("STEPS");
+        oled.println(steps);
         oled.setCursor(4,12);
-        oled.println("RAW DATA");
+        oled.println(raw_data);
         oled.rect(0, 20, LCDWIDTH,11);
         oled.setCursor(4,22);
-        oled.println("HELP");
+        oled.println(help);
         oled.display(); 
     
         break;     
@@ -109,9 +113,9 @@ void stepsPage(long steps)
   oled.clear(PAGE);
         oled.rect(0, 0, LCDWIDTH,LCDHEIGHT);
         oled.setCursor(2,2);
-        oled.println("No. of");
+        oled.println(F("No. of"));
         oled.setCursor(2,10);
-        oled.println("STEPS:");
+        oled.println(F("STEPS:"));
         oled.setCursor(2,20);
         oled.println(steps);
         oled.display(); 
@@ -123,15 +127,15 @@ void rawDataPage(float x, float y, float z)
         oled.clear(PAGE);
         oled.rect(0, 0, LCDWIDTH,LCDHEIGHT);
         oled.setCursor(2,2);
-        oled.println("Accel");
+        oled.println(F("Accel"));
         oled.setCursor(2,10);
-        oled.print("x ");
+        oled.print(F("x "));
         oled.println(x);
         oled.setCursor(2,20);
-        oled.print("y ");
+        oled.print(F("y "));
         oled.println(y);
         oled.setCursor(2,30);
-        oled.print("z ");
+        oled.print(F("z "));
         oled.println(z);
         oled.display(); 
 }
@@ -168,7 +172,7 @@ void switchPage()
   {
     a = printAccel();
     rawDataPage(a.x,a.y,a.z);
-    Serial.println("page being refreshed");
+    Serial.println(F("page being refreshed"));
     Serial.print(a.x);
     Serial.print(a.y);
     Serial.print(a.z);
