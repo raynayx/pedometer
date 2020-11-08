@@ -27,7 +27,7 @@ axes printAccel();
 LSM9DS1 imu;
 
 // #################### Steps variables###########
-long steps = 0;   // number of steps
+unsigned long steps = 0;   // number of steps
 axes stored_reading[50];
 int sampling_counter = 0; 
 float precision = 0.7;
@@ -64,7 +64,7 @@ void setupSensor()
 }
 
 
-long countStep()
+unsigned long countStep()
 {
 axes reading = {0,0,0};   // result after digital filter       
 axes maxSample = {0.1,0.3,0.9};        //maximum of 3 axes

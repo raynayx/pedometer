@@ -2,7 +2,7 @@
 #include <Arduino.h>
 void calibrateAccel();
 void setupSensor(); // setup the range and other params of sensor
-long countStep();    // step counting algorithm
+unsigned long countStep();    // step counting algorithm
 
 struct axes{float x; float y; float z;};
 
