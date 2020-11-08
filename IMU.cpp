@@ -28,7 +28,7 @@ LSM9DS1 imu;
 
 // #################### Steps variables###########
 unsigned long steps = 0;   // number of steps
-axes stored_reading[50];
+axes stored_reading[50] = {0};
 int sampling_counter = 0; 
 float precision = 0.7;
 axes threshold = {0.6,0.6,0.6};
@@ -75,21 +75,30 @@ axes delta;
   
  if (imu.accelAvailable())
   { 
-    for (int i = 0; i < 4; i++)
-    {
       imu.readAccel();
-      reading.x += abs(imu.calcAccel(imu.ax));
-      reading.y += abs(imu.calcAccel(imu.ay));
-      reading.z += abs(imu.calcAccel(imu.az));
-      myWait(20);
-    }
+      reading.x = abs(imu.calcAccel(imu.ax));
+      reading.y = abs(imu.calcAccel(imu.ay));
+      reading.z = abs(imu.calcAccel(imu.az));
   }
 
-reading.x = reading.x/4;
-reading.y = reading.y/4;
-reading.z = reading.z/4;
+// reading.x = reading.x/4;
+// reading.y = reading.y/4;
+// reading.z = reading.z/4;
   
 stored_reading[sampling_counter] = reading;
+if (sampling_counter >= 4)
+{
+  axes temp = {0,0,0};
+  for (int i = sampling_counter - 4; i < sampling_counter; i++ )
+  {
+    temp.x += stored_reading[i].x;
+    temp.y += stored_reading[i].y;
+    temp.z += stored_reading[i].z;
+  }
+  stored_reading[sampling_counter] = temp;
+}
+
+
 sampling_counter++;
 
  if(sampling_counter == 50)
@@ -110,9 +119,9 @@ sampling_counter++;
  // else sample_new is unchanged
 
 
-delta.x = threshold.x - abs(reading.x);
-delta.y = threshold.y - abs(reading.y);
-delta.z = threshold.z - abs(reading.z);
+delta.x = threshold.x - abs(stored_reading[sampling_counter].x);
+delta.y = threshold.y - abs(stored_reading[sampling_counter].y);
+delta.z = threshold.z - abs(stored_reading[sampling_counter].z);
 
 //find greatest delta
 sample_old = sample_new;
@@ -121,7 +130,7 @@ Serial.println(maxAxis(delta));
 if(maxAxis(delta) > precision) 
 {
   Serial.println("**");
-  sample_new = maxAxis(reading); //sample_result
+  sample_new = maxAxis(stored_reading[sampling_counter]); //sample_result
   
   if(sample_new < sample_old - 0.1)
   {
