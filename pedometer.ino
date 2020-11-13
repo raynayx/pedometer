@@ -19,6 +19,15 @@ pedometer glue
 const uint8_t navBtn = 2;
 const uint8_t selBtn = 3;
 
+bool navBtnLastState = HIGH;
+bool selBtnLastState = HIGH;
+bool navBtnState;
+bool selBtnState;
+
+unsigned long navLastDebounce = 0;
+unsigned long selLastDebounce = 0;
+int debounceDelay = 50;
+
 void setup()
 {
     Serial.begin(115200);
@@ -41,24 +50,42 @@ void loop()
   uint8_t readNavBtn = digitalRead(navBtn);
   uint8_t readSelBtn = digitalRead(selBtn);
   
-  if(!readNavBtn)
+  if(readNavBtn != navBtnLastState)
   {
-    myWait(100);
-    if(!readNavBtn)
+    navLastDebounce = millis();
+  }
+  if(readSelBtn != selBtnLastState)
+  {
+    selLastDebounce = millis();
+  }
+
+  if((millis() - navLastDebounce) > debounceDelay)
+  {
+    if(readNavBtn != navBtnState)
     {
-      moveMenu(); 
-      goHome();
+      navBtnState = readNavBtn;
+
+      if(navBtnState == LOW)
+      {
+        moveMenu(); 
+        goHome();
+      }
     }
   }
-  
-  if(!readSelBtn)
+
+  if((millis() - selLastDebounce) > debounceDelay)
   {
-    myWait(100);
-    if(!readSelBtn)
+    if(readSelBtn != selBtnState)
     {
-      switchPage();
+      selBtnState = readSelBtn;
+      if(selBtnState == LOW)
+      {
+        switchPage();
+      }
     }
   }
+  navBtnLastState = readNavBtn;
+  selBtnLastState = readSelBtn;
   
   refreshPage();
 //  Serial.println(countStep());

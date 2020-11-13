@@ -80,23 +80,44 @@ axes delta;
       reading.y = abs(imu.calcAccel(imu.ay));
       reading.z = abs(imu.calcAccel(imu.az));
   }
+  else
+  {
+    return steps;
+  }
 
 // reading.x = reading.x/4;
 // reading.y = reading.y/4;
 // reading.z = reading.z/4;
   
 stored_reading[sampling_counter] = reading;
-if (sampling_counter >= 4)
-{
+
+
   axes temp = {0,0,0};
-  for (int i = sampling_counter - 4; i < sampling_counter; i++ )
+  int count = 0; 
+  while(count < 4)
   {
-    temp.x += stored_reading[i].x;
-    temp.y += stored_reading[i].y;
-    temp.z += stored_reading[i].z;
+    if(sampling_counter + count >= 50)
+    {
+      temp.x += stored_reading[count].x;
+      temp.y += stored_reading[count].y;
+      temp.z += stored_reading[count].z;
+    }
+    else
+    {
+      temp.x += stored_reading[sampling_counter + count].x;
+      temp.y += stored_reading[sampling_counter + count].y;
+      temp.z += stored_reading[sampling_counter + count].z; 
+    }
+    
+    count++;
   }
+  temp.x = temp.x/4;
+  temp.y = temp.y/4;
+  temp.z = temp.z/4;
+  
   stored_reading[sampling_counter] = temp;
-}
+
+
 
 
 sampling_counter++;
