@@ -191,3 +191,13 @@ void goHome()
      currentPage = page::home;
   }
 }
+
+void screenOff()
+{
+  oled.command(DISPLAYOFF);
+}
+
+void screenOn()
+{
+  oled.command(DISPLAYON);
+}

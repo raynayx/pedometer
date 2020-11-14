@@ -169,6 +169,10 @@ if(maxAxis(delta) > precision)
     }
   }
 }
+else if (maxAxis(delta) < precision)
+{
+  
+}
 
 return steps;
 

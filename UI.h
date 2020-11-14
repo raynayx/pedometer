@@ -33,4 +33,5 @@ void moveMenu();
 void switchPage();
 void refreshPage();
 void goHome();
-
+void screenOn();
+void screenOff();
