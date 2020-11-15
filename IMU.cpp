@@ -29,12 +29,13 @@ LSM9DS1 imu;
 // #################### Steps variables###########
 unsigned long steps = 0;   // number of steps
 axes stored_reading[50] = {0};
-int sampling_counter = 0; 
-float precision = 0.7;
-axes threshold = {0.6,0.6,0.6};
-float sample_new = 0;
-float sample_old = 0;
+uint8_t sampling_counter = 0; 
+float precision = 0.2;
+axes threshold = {0.3,0.3,0.3};
+float sample_new;
+float sample_old;
 unsigned long timeOfPreviousStep = 0;
+uint8_t interval = 0;
 //####################################
 
 
@@ -45,8 +46,8 @@ void setupSensor()
 
   if (!imu.begin() ) // with no arguments, this uses default addresses (AG:0x6B, M:0x1E) and i2c port (Wire).
   {
-    Serial.println("Failed to communicate with LSM9DS1.");
-    Serial.println("Double-check wiring.");
+    Serial.println(F("Failed to communicate with LSM9DS1."));
+    Serial.println(F("Double-check wiring."));
     while (1);
   }
   imu.settings.gyro.enabled = false;
@@ -68,58 +69,68 @@ unsigned long countStep()
 {
 axes reading = {0,0,0};   // result after digital filter       
 axes maxSample = {0.1,0.3,0.9};        //maximum of 3 axes
-axes minSample = {0.0,0.0,0.2};         // minimum of 3 axes
-
+axes minSample = {0.0,0.0,0.0};         // minimum of 3 axes
+axes temp = {0,0,0};
 axes delta;
 
   
  if (imu.accelAvailable())
-  { 
+  {
+      for(int i = 0; i < 4; i++)
+      { 
       imu.readAccel();
-      reading.x = abs(imu.calcAccel(imu.ax));
-      reading.y = abs(imu.calcAccel(imu.ay));
-      reading.z = abs(imu.calcAccel(imu.az));
+      reading.x += abs(imu.calcAccel(imu.ax));
+      reading.y += abs(imu.calcAccel(imu.ay));
+      reading.z += abs(imu.calcAccel(imu.az));
+      interval++;
+      }
+      interval = interval >= 100 ? 0: interval;
+       
+      reading.x = reading.x/4;
+      reading.y = reading.y/4;
+      reading.z = reading.z/4;
   }
   else
   {
     return steps;
   }
 
-// reading.x = reading.x/4;
-// reading.y = reading.y/4;
-// reading.z = reading.z/4;
   
 stored_reading[sampling_counter] = reading;
 
+for(int i = 0; i < 4; i++)
+{
+  int count = sampling_counter + i;
 
-  axes temp = {0,0,0};
-  int count = 0; 
-  while(count < 4)
+  if(count == 50)
   {
-    if(sampling_counter + count >= 50)
-    {
-      temp.x += stored_reading[count].x;
-      temp.y += stored_reading[count].y;
-      temp.z += stored_reading[count].z;
-    }
-    else
-    {
-      temp.x += stored_reading[sampling_counter + count].x;
-      temp.y += stored_reading[sampling_counter + count].y;
-      temp.z += stored_reading[sampling_counter + count].z; 
-    }
-    
-    count++;
+    temp.x += stored_reading[0].x;
+    temp.y += stored_reading[0].y;
+    temp.z += stored_reading[0].z;
   }
-  temp.x = temp.x/4;
-  temp.y = temp.y/4;
-  temp.z = temp.z/4;
-  
-  stored_reading[sampling_counter] = temp;
+  else if(count == 51)
+  {
+    temp.x += stored_reading[1].x;
+    temp.y += stored_reading[1].y;
+    temp.z += stored_reading[1].z;
+  }
+  else if( count == 52)
+  {
+    temp.x += stored_reading[2].x;
+    temp.y += stored_reading[2].y;
+    temp.z += stored_reading[2].z;
+  }
+  else
+  {
+    temp.x += stored_reading[count].x;
+    temp.y += stored_reading[count].y;
+    temp.z += stored_reading[count].z;
+  }
+}
 
-
-
-
+temp.x = temp.x/4;
+temp.y = temp.y/4;
+temp.z = temp.z/4;
 sampling_counter++;
 
  if(sampling_counter == 50)
@@ -140,44 +151,45 @@ sampling_counter++;
  // else sample_new is unchanged
 
 
-delta.x = threshold.x - abs(stored_reading[sampling_counter].x);
-delta.y = threshold.y - abs(stored_reading[sampling_counter].y);
-delta.z = threshold.z - abs(stored_reading[sampling_counter].z);
+// delta.x = threshold.x - abs(stored_reading[sampling_counter].x);
+// delta.y = threshold.y - abs(stored_reading[sampling_counter].y);
+// delta.z = threshold.z - abs(stored_reading[sampling_counter].z);
 
-//find greatest delta
-sample_old = sample_new;
-Serial.println(maxAxis(delta));
+delta.x = threshold.x - abs(temp.x);
+delta.y = threshold.y - abs(temp.y);
+delta.z = threshold.z - abs(temp.z);
 
 if(maxAxis(delta) > precision) 
 {
-  Serial.println("**");
-  sample_new = maxAxis(stored_reading[sampling_counter]); //sample_result
+  Serial.println(F("**"));
+  sample_old = sample_new;
+  sample_new = maxAxis(temp); //sample_result
   
-  if(sample_new < sample_old - 0.1)
+  if(sample_new < sample_old  - 0.1)
   {
-    Serial.print("new \t");
+    Serial.print(F("new \t"));
     Serial.println(sample_new,6);
     
-    Serial.print("old \t");
+    Serial.print(F("old \t"));
     Serial.println(sample_old,6);
     
-    if(millis() - timeOfPreviousStep  > 200)
-    {
-      timeOfPreviousStep = millis();
-      Serial.println("##");
-      steps++;
+    if((millis() - timeOfPreviousStep)  > 200)
+    { 
+        Serial.print(F("interval \t"));
+      Serial.println(interval);
+      if(interval >= 10 && interval <= 100)
+      {
+        timeOfPreviousStep = millis();
+        Serial.println(F("##"));
+        steps++;
+      }
+      
+      }
     }
   }
-}
-else if (maxAxis(delta) < precision)
-{
-  
+  return steps;
 }
 
-return steps;
-
-
-}
 
 
 // from LSM9DS1 library
@@ -186,7 +198,7 @@ return steps;
 axes printAccel()
 {
   axes a;
-  Serial.print("A: ");
+  Serial.print(F("A: "));
 
 #ifdef PRINT_CALCULATED
   if ( imu.accelAvailable() )
