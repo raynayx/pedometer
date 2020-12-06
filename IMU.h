@@ -20,3 +20,7 @@ float maxAxis (axes a);
 
 // delay; supply interval in milliseconds
 void myWait(int interval);
+
+void configureLSM9DS1Interrupts();
+void checkInt();
+void ack();

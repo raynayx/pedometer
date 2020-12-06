@@ -11,13 +11,14 @@ pedometer glue
 
 
 */
+#include <avr/sleep.h>
 #include "UI.h"
 #include "IMU.h"
 
 #define timeoutDelay 20000
 // BUTTON SETUP; TWO BUTTONS: ONE FOR NAVIGATION; THE OTHER FOR SELECTION
-const uint8_t navBtn = 2;
-const uint8_t selBtn = 3;
+const uint8_t navBtn = 7;
+const uint8_t selBtn = 6;
 
 bool navBtnLastState = HIGH;
 bool selBtnLastState = HIGH;
@@ -29,15 +30,41 @@ unsigned long selLastDebounce = 0;
 unsigned long timeout = 0;
 int debounceDelay = 50;
 
+uint8_t testPinA0 = A0;
+
+void testInt()
+{
+  digitalWrite(testPinA0,LOW);
+  ack();
+ detachInterrupt(digitalPinToInterrupt(3));
+}
+
+void wake()
+{
+  sleep_disable();
+  ack();
+  detachInterrupt(digitalPinToInterrupt(3));
+}
+
+void sleepNow()
+{
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  noInterrupts();
+  sleep_enable();
+  attachInterrupt(digitalPinToInterrupt(3),wake,FALLING);
+  interrupts();
+  sleep_cpu();
+}
+
 void setup()
 {
     Serial.begin(115200);
-    
+    pinMode(testPinA0,OUTPUT);
     pinMode(navBtn,INPUT_PULLUP);
     pinMode(selBtn,INPUT_PULLUP);
 
     setupSensor();
-    
+    configureLSM9DS1Interrupts();
     setupScreen();
     welcomeScreen();
     
@@ -46,8 +73,10 @@ void setup()
 
 void loop()
 {
+ //  ADCSRA = 0;     //turn of ADC
+//  checkInt(); 
   menu();
-  
+  // attachInterrupt(digitalPinToInterrupt(3),testInt,LOW);
   uint8_t readNavBtn = digitalRead(navBtn);
   uint8_t readSelBtn = digitalRead(selBtn);
   
@@ -99,5 +128,5 @@ if((millis() - timeout) > timeoutDelay )
 {
   screenOff();
 }
-    
+   digitalWrite(testPinA0,HIGH); 
 }
