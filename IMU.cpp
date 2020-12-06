@@ -14,34 +14,36 @@ Step counter initial implementation
 
 #include "IMU.h"
 #include <Wire.h>
+#include <Arduino.h>
 #include <SparkFunLSM9DS1.h> 
 
-// IMU settings
-#define PRINT_CALCULATED
-#define PRINT_SPEED 250 // 250 ms between prints
-//static unsigned long lastPrint = 0; // Keep track of print time
-
-
-
-axes printAccel();
 LSM9DS1 imu;
 
-// #################### Steps variables###########
-unsigned long steps = 0;   // number of steps
-axes stored_reading[50] = {0};
-uint8_t sampling_counter = 0; 
-float precision = 0.2;
-axes threshold = {0.3,0.3,0.3};
-float sample_new;
-float sample_old;
-unsigned long timeOfPreviousStep = 0;
-uint8_t interval = 0;
-//####################################
 
 
-
-void setupSensor()
+axesArr IMU::xlValues()
 {
+  axesArr vals;
+  if(imu.accelAvailable())
+  {
+    for(int i = 0; i < 50; i++)
+    {
+      imu.readAccel();
+      vals.arr[i].x = imu.calcAccel(imu.ax);
+      vals.arr[i].y = imu.calcAccel(imu.ay);
+      vals.arr[i].z = imu.calcAccel(imu.az);
+    }
+  }
+  else
+  {
+    
+  }
+  return vals;
+}
+
+void IMU::setupSensor()
+{
+//   pinMode(intPin,INPUT_PULLUP);
    Wire.begin();
 
   if (!imu.begin() ) // with no arguments, this uses default addresses (AG:0x6B, M:0x1E) and i2c port (Wire).
@@ -50,6 +52,7 @@ void setupSensor()
     Serial.println(F("Double-check wiring."));
     while (1);
   }
+//  Wire.setClock(400000);
   imu.settings.gyro.enabled = false;
   imu.settings.mag.enabled = false;
   
@@ -62,10 +65,11 @@ void setupSensor()
 
   
   imu.begin();
+  
 }
 
 
-unsigned long countStep()
+unsigned long IMU::countStep()
 {
 axes reading = {0,0,0};   // result after digital filter       
 axes maxSample = {0.1,0.3,0.9};        //maximum of 3 axes
@@ -161,14 +165,14 @@ delta.z = threshold.z - abs(temp.z);
 
 if(maxAxis(delta) > precision) 
 {
-  Serial.println(F("**"));
+//  Serial.println(F("**"));
   sample_old = sample_new;
   sample_new = maxAxis(temp); //sample_result
   
   if(sample_new < sample_old  - 0.1)
   {
-    Serial.print(F("new \t"));
-    Serial.println(sample_new,6);
+//    Serial.print(F("new \t"));
+//    Serial.println(sample_new,6);
     
     Serial.print(F("old \t"));
     Serial.println(sample_old,6);
@@ -180,7 +184,7 @@ if(maxAxis(delta) > precision)
       if(interval >= 10 && interval <= 100)
       {
         timeOfPreviousStep = millis();
-        Serial.println(F("##"));
+//        Serial.println(F("##"));
         steps++;
       }
       
@@ -193,9 +197,7 @@ if(maxAxis(delta) > precision)
 
 
 // from LSM9DS1 library
-
-
-axes printAccel()
+axes IMU::printAccel()
 {
   axes a;
   Serial.print(F("A: "));
@@ -222,24 +224,24 @@ if ( imu.accelAvailable() )
   {
     imu.readAccel();
   }
-//  Serial.print(imu.ax);
-//  Serial.print(", ");
-//  Serial.print(imu.ay);
-//  Serial.print(", ");
-//  Serial.println(imu.az);
+  Serial.print(imu.ax);
+  Serial.print(", ");
+  Serial.print(imu.ay);
+  Serial.print(", ");
+  Serial.println(imu.az);
 
 
 #endif
   return a;
 }
 
-void myWait(int interval)
+void IMU::myWait(int interval)
 {  
   unsigned long  start = millis();
   while(millis() - start < interval);
 }
 
-axes maxVal(axes arr[50])
+axes IMU::maxVal(axes arr[50])
 {
       float X = abs(arr[0].x);
       float Y = abs(arr[0].y);
@@ -264,7 +266,7 @@ axes maxVal(axes arr[50])
       }
       return {X,Y,Z};
 }
-axes minVal(axes arr[50])
+axes IMU::minVal(axes arr[50])
 {
       float X = abs(arr[0].x);
       float Y = abs(arr[0].y);
@@ -290,7 +292,7 @@ axes minVal(axes arr[50])
       return {X,Y,Z};
 }
 
-float maxAxis (axes a)
+float IMU::maxAxis (axes a)
 {
   float maxVal = abs(a.x);
   if (abs(a.y) > maxVal)
@@ -303,3 +305,80 @@ float maxAxis (axes a)
   }
   return maxVal;
 }
+
+//void IMU::configureLSM9DS1Interrupts()
+//{
+//   imu.configAccelInt(XHIE_XL|YHIE_XL|ZHIE_XL, false);
+//  // 4. Configure accelerometer threshold:
+//  //   - 20: Threshold (raw value from accel)
+//  //     Multiply this value by 128 to get threshold value.
+//  //     (20 = 2600 raw accel value)
+//  //   - X_AXIS: Write to X-axis threshold
+//  //   - 10: duration (based on ODR)
+//  //   - false: wait (wait [duration] before interrupt goes low)
+//  imu.configAccelThs(20, X_AXIS, 10, false);
+//  imu.configAccelThs(25, Y_AXIS, 10, false);
+//  imu.configAccelThs(200, Z_AXIS, 10, false);
+//  // 5. Configure INT1 - assign it to gyro interrupt
+//  //   - XG_INT1: Says we're configuring INT1
+//  //   - INT1_IG_G | INT1_IG_XL: Sets interrupt source to 
+//  //     both gyro interrupt and accel
+//  //   - INT_ACTIVE_LOW: Sets interrupt to active low.
+//  //         (Can otherwise be set to INT_ACTIVE_HIGH.)
+//  //   - INT_PUSH_PULL: Sets interrupt to a push-pull.
+//  //         (Can otherwise be set to INT_OPEN_DRAIN.)
+//  imu.configInt(XG_INT1, INT1_IG_G | INT_IG_XL, INT_ACTIVE_LOW, INT_PUSH_PULL);
+//
+//  ////////////////////////////////////////////////
+//  // Configure INT2 - Gyro and Accel Data Ready //
+//  ////////////////////////////////////////////////
+//  // Configure interrupt 2 to fire whenever new accelerometer
+//  // or gyroscope data is available.
+//  // Note XG_INT2 means configuring interrupt 2.
+//  // INT_DRDY_XL is OR'd with INT_DRDY_G
+//  imu.configInt(XG_INT2, INT_DRDY_XL | INT_DRDY_G, INT_ACTIVE_LOW, INT_PUSH_PULL);
+//  
+//}
+
+//void IMU::ack()
+//{
+//  imu.getAccelIntSrc();
+//}
+
+
+//void IMU::checkInt()
+//{
+// // INT1 fires when our gyro or accelerometer thresholds
+//  // are exceeded.
+//  // It's configured to be active LOW:
+//  if (digitalRead(intPin) == LOW)
+//  {
+//    // Let's keep track of how long the interrupt is active.
+//    // We turned off latching, so this pin will stay low
+//    // as long as the threshold is exceeded:
+//    unsigned long durationStart = millis();
+//
+//    // Call getGyroIntSrc() and getAccelIntSrc() to determine
+//    // if the gyro or accel generated the input (and why).
+//    Serial.println("\tINT1 Active!");
+//    Serial.print("\t\tGyro int: 0x");
+//    Serial.println(imu.getGyroIntSrc(), HEX);
+//    Serial.print("\t\tAccel int: 0x");
+//    Serial.println(imu.getAccelIntSrc(), HEX);
+//
+//    // While the interrupt remains active, loop:
+//    while (digitalRead(intPin) == LOW)
+//    {
+//      //imu.getGyroIntSrc();
+//      //imu.getAccelIntSrc();
+//      
+//    }
+//    Serial.print("\tINT1 Duration: ");
+//    Serial.println(millis() - durationStart);
+////    return true;
+//  }
+//  else
+//  {
+//    return;
+//  }
+//}

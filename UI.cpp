@@ -1,5 +1,6 @@
 #include "UI.h"
 #include "IMU.h"
+#include "pipeline.h"
 
 // OLED over SPI
 #define PIN_RESET 9  //4 
@@ -11,10 +12,13 @@ MicroOLED oled(PIN_RESET, PIN_DC, PIN_CS);
 menuItem selection = menuItem::steps;           //home menu options
 page currentPage = page::home;                  //page selected
 
+IMU myImu;
+
 void setupScreen()
 {
   delay(100);
   oled.begin();
+  oled.contrast(0);   //seems to be the lowest brightest though not significant
   oled.clear(PAGE); 
   oled.clear(ALL);
 }
@@ -146,7 +150,7 @@ void switchPage()
       {
         // switch to steps page
         currentPage = page::steps;
-        stepsPage(countStep());
+        stepsPage(myImu.countStep());
         
       }
       else if(selection == menuItem::rawData)
@@ -167,19 +171,26 @@ void switchPage()
 }
  void refreshPage()
 {
-    axes a;
+    axesArr a;
   if (currentPage == page::rawData)
   {
-    a = printAccel();
-    rawDataPage(a.x,a.y,a.z);
-    Serial.println(F("page being refreshed"));
-    Serial.print(a.x);
-    Serial.print(a.y);
-    Serial.print(a.z);
+    // a = imu.printAccel();
+    a = myImu.xlValues();
+
+    for(int i=0; i < 50; i++)
+    {
+      rawDataPage(a.arr[i].x,a.arr[i].y,a.arr[i].z);
+      Serial.println(F("page being refreshed"));
+      Serial.print(a.arr[i].x);
+      Serial.print(a.arr[i].y);
+      Serial.print(a.arr[i].z);
+    }
+    
   }
   if (currentPage == page::steps)
   {
-    stepsPage(countStep());
+    // imu.countStep();
+    // stepsPage(imu.countStep());
   }
 }
 
