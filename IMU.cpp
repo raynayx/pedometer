@@ -37,11 +37,12 @@ float sample_old;
 unsigned long timeOfPreviousStep = 0;
 uint8_t interval = 0;
 //####################################
-
+const uint8_t intPin = 3;
 
 
 void setupSensor()
 {
+  pinMode(intPin,INPUT_PULLUP);
    Wire.begin();
 
   if (!imu.begin() ) // with no arguments, this uses default addresses (AG:0x6B, M:0x1E) and i2c port (Wire).
@@ -302,4 +303,92 @@ float maxAxis (axes a)
     maxVal = abs(a.z);
   }
   return maxVal;
+}
+
+void configureLSM9DS1Interrupts()
+{
+  /////////////////////////////////////////////
+  // Configure INT1 - Gyro & Accel Threshold //
+  /////////////////////////////////////////////
+  // For more information on setting gyro interrupt, threshold,
+  // and configuring the intterup, see the datasheet.
+  // We'll configure INT_GEN_CFG_G, INT_GEN_THS_??_G, 
+  // INT_GEN_DUR_G, and INT1_CTRL.
+ // 3. Configure accelerometer interrupt generator:
+  //   - XHIE_XL: x-axis high event
+  //     More axis events can be or'd together
+  //   - false: OR interrupts (N/A, since we only have 1)
+  imu.configAccelInt(XHIE_XL, false);
+  // 4. Configure accelerometer threshold:
+  //   - 20: Threshold (raw value from accel)
+  //     Multiply this value by 128 to get threshold value.
+  //     (20 = 2600 raw accel value)
+  //   - X_AXIS: Write to X-axis threshold
+  //   - 10: duration (based on ODR)
+  //   - false: wait (wait [duration] before interrupt goes low)
+  imu.configAccelThs(20, X_AXIS, 1, false);
+  // 5. Configure INT1 - assign it to gyro interrupt
+  //   - XG_INT1: Says we're configuring INT1
+  //   - INT1_IG_G | INT1_IG_XL: Sets interrupt source to 
+  //     both gyro interrupt and accel
+  //   - INT_ACTIVE_LOW: Sets interrupt to active low.
+  //         (Can otherwise be set to INT_ACTIVE_HIGH.)
+  //   - INT_PUSH_PULL: Sets interrupt to a push-pull.
+  //         (Can otherwise be set to INT_OPEN_DRAIN.)
+  imu.configInt(XG_INT1, INT_IG_XL, INT_ACTIVE_LOW, INT_PUSH_PULL);
+
+  ////////////////////////////////////////////////
+  // Configure INT2 - Gyro and Accel Data Ready //
+  ////////////////////////////////////////////////
+  // Configure interrupt 2 to fire whenever new accelerometer
+  // or gyroscope data is available.
+  // Note XG_INT2 means configuring interrupt 2.
+  // INT_DRDY_XL is OR'd with INT_DRDY_G
+  imu.configInt(XG_INT2, INT_DRDY_XL | INT_DRDY_G, INT_ACTIVE_LOW, INT_PUSH_PULL);
+
+  //////////////////////////////////////
+  // Configure Magnetometer Interrupt //
+  //////////////////////////////////////
+  // 1. Configure magnetometer interrupt:
+  //   - XIEN: axis to be monitored. Can be an or'd combination
+  //     of XIEN, YIEN, or ZIEN.
+  //   - INT_ACTIVE_LOW: Interrupt goes low when active.
+  //   - true: Latch interrupt
+  imu.configMagInt(XIEN, INT_ACTIVE_LOW, true);
+  // 2. Configure magnetometer threshold.
+  //   There's only one threshold value for all 3 mag axes.
+  //   This is the raw mag value that must be exceeded to
+  //   generate an interrupt.
+  imu.configMagThs(10000);
+  
+}
+void testInterrupt()
+{
+ if (digitalRead(intPin) == LOW)
+  {
+//    // Let's keep track of how long the interrupt is active.
+//    // We turned off latching, so this pin will stay low
+//    // as long as the threshold is exceeded:
+//    unsigned long durationStart = millis();
+//
+//    // Call getGyroIntSrc() and getAccelIntSrc() to determine
+//    // if the gyro or accel generated the input (and why).
+//    Serial.println("\tINT1 Active!");
+//    Serial.print("\t\tGyro int: 0x");
+//    Serial.println(imu.getGyroIntSrc(), HEX);
+//    Serial.print("\t\tAccel int: 0x");
+//    Serial.println(imu.getAccelIntSrc(), HEX);
+//
+//    // While the interrupt remains active, loop:
+//    while (digitalRead(intPin) == LOW)
+//    {
+//      //imu.getGyroIntSrc();
+//      //imu.getAccelIntSrc();
+//    }
+//    Serial.print("\tINT1 Duration: ");
+//    Serial.println(millis() - durationStart);
+
+    imu.getAccelIntSrc();
+    digitalWrite(A0,HIGH);
+  }
 }
