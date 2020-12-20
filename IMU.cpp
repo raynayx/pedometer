@@ -26,7 +26,7 @@ Step counter initial implementation
 axes printAccel();
 LSM9DS1 imu;
 
-// #################### Steps variables###########
+// #################### Steps variables#############
 unsigned long steps = 0;   // number of steps
 axes stored_reading[50] = {0};
 uint8_t sampling_counter = 0; 
@@ -36,13 +36,14 @@ float sample_new;
 float sample_old;
 unsigned long timeOfPreviousStep = 0;
 uint8_t interval = 0;
-//####################################
+//##################################################
 const uint8_t intPin = 3;
-
+const volatile uint8_t an0 = A0;
 
 void setupSensor()
 {
   pinMode(intPin,INPUT_PULLUP);
+  pinMode(an0,OUTPUT);
    Wire.begin();
 
   if (!imu.begin() ) // with no arguments, this uses default addresses (AG:0x6B, M:0x1E) and i2c port (Wire).
@@ -326,7 +327,7 @@ void configureLSM9DS1Interrupts()
   //   - X_AXIS: Write to X-axis threshold
   //   - 10: duration (based on ODR)
   //   - false: wait (wait [duration] before interrupt goes low)
-  imu.configAccelThs(20, X_AXIS, 1, false);
+  imu.configAccelThs(15, X_AXIS, 10, false);
   // 5. Configure INT1 - assign it to gyro interrupt
   //   - XG_INT1: Says we're configuring INT1
   //   - INT1_IG_G | INT1_IG_XL: Sets interrupt source to 
@@ -335,7 +336,7 @@ void configureLSM9DS1Interrupts()
   //         (Can otherwise be set to INT_ACTIVE_HIGH.)
   //   - INT_PUSH_PULL: Sets interrupt to a push-pull.
   //         (Can otherwise be set to INT_OPEN_DRAIN.)
-  imu.configInt(XG_INT1, INT_IG_XL, INT_ACTIVE_LOW, INT_PUSH_PULL);
+  imu.configInt(XG_INT1, INT_IG_XL, INT_ACTIVE_LOW, INT_OPEN_DRAIN);
 
   ////////////////////////////////////////////////
   // Configure INT2 - Gyro and Accel Data Ready //
@@ -390,5 +391,24 @@ void testInterrupt()
 
     imu.getAccelIntSrc();
     digitalWrite(A0,HIGH);
+//    detachInterrupt(digitalPinToInterrupt(3));
+    
   }
+}
+
+void intTest2()
+{
+  if(digitalRead(intPin) == LOW)
+  {
+    imu.getAccelIntSrc();
+    digitalWrite(an0,HIGH);
+  }
+}
+
+void intTest3()
+{
+    digitalWrite(an0,HIGH);
+    imu.getAccelIntSrc();
+    
+
 }

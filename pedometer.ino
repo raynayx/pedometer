@@ -28,6 +28,7 @@ unsigned long navLastDebounce = 0;
 unsigned long selLastDebounce = 0;
 unsigned long timeout = 0;
 int debounceDelay = 50;
+//const volatile uint8_t an0 = A0;
 
 void setup()
 {
@@ -39,7 +40,7 @@ void setup()
 
     setupSensor();
     configureLSM9DS1Interrupts();
-    
+//    attachInterrupt(digitalPinToInterrupt(3),intTest3,FALLING);
     setupScreen();
     welcomeScreen();
     
@@ -48,55 +49,55 @@ void setup()
 
 void loop()
 {
-  digitalWrite(A0,LOW);
-  // menu();
-//  testInterrupt();
-  
-  // uint8_t readNavBtn = digitalRead(navBtn);
-  // uint8_t readSelBtn = digitalRead(selBtn);
-  
-  // if(readNavBtn != navBtnLastState)
-  // {
-  //   navLastDebounce = millis();
-  // }
-  // if(readSelBtn != selBtnLastState)
-  // {
-  //   selLastDebounce = millis();
-  // }
+    digitalWrite(A0,LOW);
+   menu();
+//    intTest2();
 
-  // if((millis() - navLastDebounce) > debounceDelay)
-  // {
-  //   if(readNavBtn != navBtnState)
-  //   {
-  //     navBtnState = readNavBtn;
-
-  //     if(navBtnState == LOW)
-  //     {
-  //       screenOn();
-  //       moveMenu(); 
-  //       goHome();
-  //       timeout = millis();
-  //     }
-  //   }
-  // }
-
-  // if((millis() - selLastDebounce) > debounceDelay)
-  // {
-  //   if(readSelBtn != selBtnState)
-  //   {
-  //     selBtnState = readSelBtn;
-  //     if(selBtnState == LOW)
-  //     {
-  //       screenOn();
-  //       switchPage();
-  //       timeout = millis();
-  //     }
-  //   }
-  // }
-  // navBtnLastState = readNavBtn;
-  // selBtnLastState = readSelBtn;
+  uint8_t readNavBtn = digitalRead(navBtn);
+  uint8_t readSelBtn = digitalRead(selBtn);
   
-  // refreshPage();
+  if(readNavBtn != navBtnLastState)
+  {
+    navLastDebounce = millis();
+  }
+  if(readSelBtn != selBtnLastState)
+  {
+    selLastDebounce = millis();
+  }
+
+  if((millis() - navLastDebounce) > debounceDelay)
+  {
+    if(readNavBtn != navBtnState)
+    {
+      navBtnState = readNavBtn;
+
+      if(navBtnState == LOW)
+      {
+        screenOn();
+        moveMenu(); 
+        goHome();
+        timeout = millis();
+      }
+    }
+  }
+
+  if((millis() - selLastDebounce) > debounceDelay)
+  {
+    if(readSelBtn != selBtnState)
+    {
+      selBtnState = readSelBtn;
+      if(selBtnState == LOW)
+      {
+        screenOn();
+        switchPage();
+        timeout = millis();
+      }
+    }
+  }
+  navBtnLastState = readNavBtn;
+  selBtnLastState = readSelBtn;
+  
+  refreshPage();
 //  Serial.println(countStep());
 
 // if((millis() - timeout) > timeoutDelay )
