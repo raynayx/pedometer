@@ -23,4 +23,7 @@ void myWait(int interval);
 void testInterrupt();
 void intTest2();
 void intTest3();
+void intReady();
+void intReady2();
 void configureLSM9DS1Interrupts();
+void printHere();

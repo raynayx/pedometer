@@ -38,11 +38,14 @@ unsigned long timeOfPreviousStep = 0;
 uint8_t interval = 0;
 //##################################################
 const uint8_t intPin = 3;
+const uint8_t dready = 2;
 const volatile uint8_t an0 = A0;
+volatile int here = 0;
 
 void setupSensor()
 {
   pinMode(intPin,INPUT_PULLUP);
+  pinMode(dready,INPUT_PULLUP);
   pinMode(an0,OUTPUT);
    Wire.begin();
 
@@ -60,7 +63,7 @@ void setupSensor()
   // 1 = 10 Hz    4 = 238 Hz
   // 2 = 50 Hz    5 = 476 Hz
   // 3 = 119 Hz   6 = 952 Hz
-  imu.settings.accel.sampleRate = 2;
+  imu.settings.accel.sampleRate = 1;
 
   
   imu.begin();
@@ -327,7 +330,7 @@ void configureLSM9DS1Interrupts()
   //   - X_AXIS: Write to X-axis threshold
   //   - 10: duration (based on ODR)
   //   - false: wait (wait [duration] before interrupt goes low)
-  imu.configAccelThs(15, X_AXIS, 10, false);
+  imu.configAccelThs(25, X_AXIS, 10, false);
   // 5. Configure INT1 - assign it to gyro interrupt
   //   - XG_INT1: Says we're configuring INT1
   //   - INT1_IG_G | INT1_IG_XL: Sets interrupt source to 
@@ -336,7 +339,7 @@ void configureLSM9DS1Interrupts()
   //         (Can otherwise be set to INT_ACTIVE_HIGH.)
   //   - INT_PUSH_PULL: Sets interrupt to a push-pull.
   //         (Can otherwise be set to INT_OPEN_DRAIN.)
-  imu.configInt(XG_INT1, INT_IG_XL, INT_ACTIVE_LOW, INT_OPEN_DRAIN);
+  imu.configInt(XG_INT1, INT_IG_XL, INT_ACTIVE_LOW, INT_PUSH_PULL);
 
   ////////////////////////////////////////////////
   // Configure INT2 - Gyro and Accel Data Ready //
@@ -345,7 +348,7 @@ void configureLSM9DS1Interrupts()
   // or gyroscope data is available.
   // Note XG_INT2 means configuring interrupt 2.
   // INT_DRDY_XL is OR'd with INT_DRDY_G
-  imu.configInt(XG_INT2, INT_DRDY_XL | INT_DRDY_G, INT_ACTIVE_LOW, INT_PUSH_PULL);
+  imu.configInt(XG_INT2, INT_DRDY_XL, INT_ACTIVE_LOW, INT_PUSH_PULL);
 
   //////////////////////////////////////
   // Configure Magnetometer Interrupt //
@@ -401,14 +404,38 @@ void intTest2()
   if(digitalRead(intPin) == LOW)
   {
     imu.getAccelIntSrc();
-    digitalWrite(an0,HIGH);
+    digitalWrite(an0,!digitalRead(an0));
   }
 }
 
 void intTest3()
 {
-    digitalWrite(an0,HIGH);
+    ++here;
+    digitalWrite(13,!digitalRead(13));
     imu.getAccelIntSrc();
-    
+    detachInterrupt(digitalPinToInterrupt(3));
+}
 
+void intReady()
+{
+   if (digitalRead(dready) == LOW)
+  {
+    digitalWrite(an0, !digitalRead(an0));
+    if (imu.accelAvailable())
+      imu.readAccel();
+  }
+}
+
+void intReady2()
+{
+  imu.getAccelIntSrc();
+  ++here;
+    digitalWrite(13,!digitalRead(13));
+    return;
+}
+
+void printHere()
+{
+  Serial.print("We're at\t");
+  Serial.println(here);
 }
