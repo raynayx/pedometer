@@ -14,7 +14,7 @@ pedometer glue
 #include "UI.h"
 #include "IMU.h"
 
-#define timeoutDelay 2000
+#define timeoutDelay 10000
 // BUTTON SETUP; TWO BUTTONS: ONE FOR NAVIGATION; THE OTHER FOR SELECTION
 const uint8_t navBtn = 7;
 const uint8_t selBtn = 6;
@@ -46,13 +46,13 @@ void setup()
 //    intReady2();
 //    setupScreen();
 //    welcomeScreen();
-    
+}    
 
-}
+
 
 void loop()
 {
- attachInterrupt(digitalPinToInterrupt(3),intTest3,LOW);
+ 
 
 //  uint8_t readNavBtn = digitalRead(navBtn);
 //  uint8_t readSelBtn = digitalRead(selBtn);
@@ -99,14 +99,16 @@ void loop()
 //  selBtnLastState = readSelBtn;
 //  
 //  refreshPage();
-
-//  Serial.println(countStep());
-  printHere();
+    int a;
+    a = countStep();
+//  printHere();
  if((millis() - timeout) > timeoutDelay )
  {
-  Serial.println(countStep());
+  Serial.println(a);
+  Serial.println("HELLO");
   timeout = millis();
 //   screenOff();
  }
-    
+//attachInterrupt(digitalPinToInterrupt(3),intTest3,LOW); 
+attachInterrupt(digitalPinToInterrupt(2),intReady2,LOW);   
 }

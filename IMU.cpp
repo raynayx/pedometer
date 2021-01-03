@@ -41,6 +41,7 @@ const uint8_t intPin = 3;
 const uint8_t dready = 2;
 const volatile uint8_t an0 = A0;
 volatile int here = 0;
+volatile bool callCount = false;
 
 void setupSensor()
 {
@@ -72,6 +73,11 @@ void setupSensor()
 
 unsigned long countStep()
 {
+  if(!callCount)
+  {
+    return steps;
+  }
+  callCount = false;
 axes reading = {0,0,0};   // result after digital filter       
 axes maxSample = {0.1,0.3,0.9};        //maximum of 3 axes
 axes minSample = {0.0,0.0,0.0};         // minimum of 3 axes
@@ -166,26 +172,26 @@ delta.z = threshold.z - abs(temp.z);
 
 if(maxAxis(delta) > precision) 
 {
-  Serial.println(F("**"));
+//  Serial.println(F("**"));
   sample_old = sample_new;
   sample_new = maxAxis(temp); //sample_result
   
   if(sample_new < sample_old  - 0.1)
   {
-    Serial.print(F("new \t"));
-    Serial.println(sample_new,6);
-    
-    Serial.print(F("old \t"));
-    Serial.println(sample_old,6);
+//    Serial.print(F("new \t"));
+//    Serial.println(sample_new,6);
+//    
+//    Serial.print(F("old \t"));
+//    Serial.println(sample_old,6);
     
     if((millis() - timeOfPreviousStep)  > 200)
     { 
-        Serial.print(F("interval \t"));
-      Serial.println(interval);
+//        Serial.print(F("interval \t"));
+//      Serial.println(interval);
       if(interval >= 10 && interval <= 100)
       {
         timeOfPreviousStep = millis();
-        Serial.println(F("##"));
+//        Serial.println(F("##"));
         steps++;
       }
       
@@ -410,10 +416,11 @@ void intTest2()
 
 void intTest3()
 {
-    ++here;
-    digitalWrite(13,!digitalRead(13));
-    imu.getAccelIntSrc();
     detachInterrupt(digitalPinToInterrupt(3));
+    ++here;
+//    digitalWrite(13,!digitalRead(13));
+    imu.getAccelIntSrc();
+//    callCount = true;
 }
 
 void intReady()
@@ -428,10 +435,10 @@ void intReady()
 
 void intReady2()
 {
-  imu.getAccelIntSrc();
-  ++here;
+    detachInterrupt(digitalPinToInterrupt(2));
+    callCount = true;
     digitalWrite(13,!digitalRead(13));
-    return;
+    imu.getAccelIntSrc();
 }
 
 void printHere()
