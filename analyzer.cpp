@@ -7,7 +7,7 @@ Analyzer::Analyzer(struct oneDArr d)
 }
 
 
-Analyzer::measure_steps()
+int Analyzer::measure_steps()
 {
     steps = 0;
     bool count_steps = true;

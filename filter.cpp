@@ -6,37 +6,37 @@
 
 
 
-axesArr Filter::low_0_hz(axesArr data)
+axesArr Filter::low_0_hz(axesArr &data)
 {
-    filter(data,LOW_0_HZ);
+    return filter(data,LOW_0_HZ);
 }
 //low_5_hz(data)
-axesArr Filter::low_5_hz(axesArr data)
+axesArr Filter::low_5_hz(axesArr &data)
 {
-    filter(data,LOW_5_HZ);
+    return filter(data,LOW_5_HZ);
 }
 //high_1_hz(data)
-axesArr Filter::high_1_hz(axesArr data)
+axesArr Filter::high_1_hz(axesArr &data)
 {
-    filter(data,HIGH_1_HZ);
+    return filter(data,HIGH_1_HZ);
 }
 
-oneDArr Filter::low_0_hz(oneDArr data)
+oneDArr Filter::low_0_hz(oneDArr &data)
 {
-    filter(data,LOW_0_HZ);
+    return filter(data,LOW_0_HZ);
 }
 //low_5_hz(data)
-oneDArr Filter::low_5_hz(oneDArr data)
+oneDArr Filter::low_5_hz(oneDArr &data)
 {
-    filter(data,LOW_5_HZ);
+    return filter(data,LOW_5_HZ);
 }
 //high_1_hz(data)
-oneDArr Filter::high_1_hz(oneDArr data)
+oneDArr Filter::high_1_hz(oneDArr &data)
 {
-    filter(data,HIGH_1_HZ);
+	return filter(data,HIGH_1_HZ);
 }
 
-axesArr Filter::filter(axesArr data,COEFFICIENTS coefficients)
+axesArr Filter::filter(axesArr &data,COEFFICIENTS &coefficients)
 {
     axesArr filtered_data;
     filtered_data.arr[0]={0.0,0.0,0.0};
@@ -71,7 +71,7 @@ axesArr Filter::filter(axesArr data,COEFFICIENTS coefficients)
 
     return filtered_data;
 }    
-oneDArr Filter::filter(oneDArr data,COEFFICIENTS coefficients)
+oneDArr Filter::filter(oneDArr &data,COEFFICIENTS &coefficients)
 {
     oneDArr filtered_data;
     filtered_data.oneDArr[0]=0.0;

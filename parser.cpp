@@ -13,7 +13,7 @@ Filter fp;
         {
             // create object and call parse on it
             Parser p(d);
-            p.parse();
+            return p.parse();
         }
 
         parsedAxesArr Parser::parse()

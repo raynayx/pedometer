@@ -1,4 +1,4 @@
-#include "IMU.h"
+//#include "IMU.h"
 #include "parser.h"
 #include "processor.h"
 #include "analyzer.h"
@@ -11,15 +11,17 @@
 
 int countSteps()
 {
-    IMU imu;
-
+    //IMU imu;
+	/*
     axesArr a = imu.xlValues();
-
-    for (int i; i < 50; i++)
+	
+		for (int i; i < 50; i++)
     {
         Serial.println(a.arr[i].x);
         Serial.println(a.arr[i].y);
         Serial.println(a.arr[i].z);
     }
+	*/
+    
     return 1;
 }

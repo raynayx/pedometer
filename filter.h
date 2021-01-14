@@ -12,22 +12,22 @@ class Filter
     
         //low_0_hz(data) 
         //split total xl into u_xl and g_xl
-        axesArr low_0_hz(axesArr data);
+        axesArr low_0_hz(axesArr &data);
         //low_5_hz(data)
-        axesArr low_5_hz(axesArr data);
+        axesArr low_5_hz(axesArr &data);
         //high_1_hz(data)
-        axesArr high_1_hz(axesArr data);
+        axesArr high_1_hz(axesArr &data);
 
          //low_0_hz(data) 
         //filter low frequencies from one D 
-        oneDArr low_0_hz(oneDArr data);
+        oneDArr low_0_hz(oneDArr &data);
         //low_5_hz(data)
-        oneDArr low_5_hz(oneDArr data);
+        oneDArr low_5_hz(oneDArr &data);
         //high_1_hz(data)
-        oneDArr high_1_hz(oneDArr data);
+        oneDArr high_1_hz(oneDArr &data);
 
     private:
-        axesArr filter(axesArr data,COEFFICIENTS coefficients);  
-        oneDArr filter(oneDArr data,COEFFICIENTS coefficients);
+        axesArr filter(axesArr &data,COEFFICIENTS &coefficients);  
+        oneDArr filter(oneDArr &data,COEFFICIENTS &coefficients);
 
 };
