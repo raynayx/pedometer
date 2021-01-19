@@ -12,7 +12,7 @@ pedometer glue
 
 */
 // #include "UI.h"
-#include "UI2.h"
+#include "UI.h"
 #include "IMU.h"
 
 #define timeoutDelay 10000
