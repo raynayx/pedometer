@@ -11,10 +11,13 @@ pedometer glue
 
 
 */
-#include "UI.h"
+// #include "UI.h"
+#include "UI2.h"
 #include "IMU.h"
 
 #define timeoutDelay 10000
+#define PRINT_DEBUG_INFO 
+//#define NO_PRINT
 // BUTTON SETUP; TWO BUTTONS: ONE FOR NAVIGATION; THE OTHER FOR SELECTION
 const uint8_t navBtn = 7;
 const uint8_t selBtn = 6;
@@ -30,29 +33,38 @@ unsigned long timeout = 0;
 int debounceDelay = 50;
 //const volatile uint8_t an0 = A0;
 
-
+UI ui;
 void setup()
 {
     Serial.begin(115200);
+
+    ui.setupScreen();
+    ui.welcomeScreen();
     
     pinMode(navBtn,INPUT_PULLUP);
     pinMode(selBtn,INPUT_PULLUP);
     pinMode(A0,OUTPUT);
-
-    setupSensor();
-    configureLSM9DS1Interrupts();
+//
+//    setupSensor();
+//    configureLSM9DS1Interrupts();
 //    attachInterrupt(digitalPinToInterrupt(3),intTest3,LOW);
 //    attachInterrupt(digitalPinToInterrupt(2),intReady2,LOW);
 //    intReady2();
-//    setupScreen();
-//    welcomeScreen();
+
 }    
 
 
 
 void loop()
 {
- 
+  
+#ifdef PRINT_DEBUG_INFO
+  String err= F("Test");
+  ui.errorLog(err);
+Serial.println(err);
+// #elif defined NO_PRINT
+
+#endif
 
 //  uint8_t readNavBtn = digitalRead(navBtn);
 //  uint8_t readSelBtn = digitalRead(selBtn);
