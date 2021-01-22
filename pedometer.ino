@@ -13,12 +13,13 @@ pedometer glue
 */
 // #include <avr/sleep.h>
 #include "UI.h"
-#include "IMU.h"
-#include "filter.h"
+// #include "IMU.h"
+// #include "filter.h"
+// #include "parser.h"
+#include "pipeline.h"
 
 #define timeoutDelay 20000
-//#define TEST_ASA
-int c= 0;
+#define TEST_ASA
 // BUTTON SETUP; TWO BUTTONS: ONE FOR NAVIGATION; THE OTHER FOR SELECTION
 const uint8_t navBtn = 7;
 const uint8_t selBtn = 6;
@@ -60,15 +61,15 @@ int debounceDelay = 50;
 //  sleep_cpu();
 //}
 
-// IMU myImuP;
+// IMU imu;
 void setup()
 {
     Serial.begin(115200);
 //    pinMode(testPinA0,OUTPUT);
     pinMode(navBtn,INPUT_PULLUP);
     pinMode(selBtn,INPUT_PULLUP);
-    // myImuP.setupSensor();
-//    imu.configureLSM9DS1Interrupts();
+    // imu.setupSensor();
+    // imu.configureLSM9DS1Interrupts();
 //    setupScreen();
 //    welcomeScreen();   
     
@@ -139,19 +140,10 @@ void loop()
 // }
 //digitalWrite(testPinA0,HIGH);
 
-//#ifdef TEST_ASA
-axesArr a;
-axesArr res;
-Filter f;
-for(int i=0;i<50;i++)
-a.arr[i]= {1,2,3};
-
-res = f.low_5_hz(a);
-
-Serial.println("here");
+#ifdef TEST_ASA 
+int a = countSteps();
+Serial.println(a);
 delay(1000);
-Serial.println(res.arr[8].z);
-
-//#endif
-    
+#endif
+  
 }

@@ -8,7 +8,7 @@ class Processor
         oneDArr filtered_data;
         parsedAxesArr parsedData;
         Processor(parsedAxesArr pdata);
-        axesArr run(parsedAxesArr pdata);
+        oneDArr run();
 
     private:
         // dot_product of all the axes

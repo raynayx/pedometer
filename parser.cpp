@@ -9,11 +9,10 @@ Filter fp;
         {
             data = d;
         }
-        parsedAxesArr Parser::run(axesArr d)
+        parsedAxesArr Parser::run()
         {
             // create object and call parse on it
-            Parser p(d);
-            return p.parse();
+            return (*this).parse();
         }
 
         parsedAxesArr Parser::parse()

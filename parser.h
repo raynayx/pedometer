@@ -8,7 +8,7 @@ class Parser
         parsedAxesArr parsed_data;
 
         Parser(axesArr d);
-        parsedAxesArr run(axesArr d);
+        parsedAxesArr run();
 
     private:
         parsedAxesArr parse();

@@ -32,3 +32,11 @@ oneDArr Processor::filter()
     return filtered_data;
 
 }
+
+oneDArr Processor::run()
+{
+    // find dot product
+    dot_product();
+    return filter();
+    // filter in 1D
+}
