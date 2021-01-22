@@ -59,7 +59,7 @@ void loop()
 {
   
 #ifdef PRINT_DEBUG_INFO
-  String err= F("Test");
+  String err= F("Test is the longest error message you have ever seen that you cannot believe.");
   ui.errorLog(err);
 Serial.println(err);
 // #elif defined NO_PRINT

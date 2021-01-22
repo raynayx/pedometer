@@ -215,6 +215,8 @@ void UI::errorLog(String &err)
 {
     //handle error logging to screen here
     oled.clear(PAGE);
+    oled.setCursor(0,0);
+    oled.scrollRight(32,32);
     oled.print(err);
     oled.display();
 }
