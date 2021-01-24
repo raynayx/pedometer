@@ -5,7 +5,7 @@
 // call processor to process
 // call analyzer to count steps
 
-static LSM9DS1 lsm;
+
 
 //sequence leading to step counts
 int countSteps()
@@ -19,6 +19,12 @@ for(int i=0;i<50;i++)
   {
   lsm.readAccel();
   imuData.arr[i]= {lsm.calcAccel(lsm.ax),lsm.calcAccel(lsm.ay),lsm.calcAccel(lsm.az)};
+  Serial.print(imuData.arr[i].x);
+  Serial.print("\t");
+  Serial.print(imuData.arr[i].y);
+  Serial.print("\t");
+  Serial.println(imuData.arr[i].z);
+  
   }
 }
 

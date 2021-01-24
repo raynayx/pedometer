@@ -7,5 +7,6 @@
 #include "types.h"
 #include <Arduino.h>
 
-static IMU imu;
+extern IMU imu;
+extern LSM9DS1 lsm;
 int countSteps();

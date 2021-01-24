@@ -58,7 +58,7 @@ int debounceDelay = 50;
 //  sleep_cpu();
 //}
 
-// IMU myImu1;
+
 void setup()
 {
     Serial.begin(115200);
@@ -136,11 +136,10 @@ void loop()
 
 // }
 //digitalWrite(testPinA0,HIGH);
-Serial.println("go");
 #ifdef TEST_ASA 
 int a = countSteps();
 Serial.println(a);
-imu.printAccel();
+//imu.printAccel();
 delay(1000);
 #endif
   

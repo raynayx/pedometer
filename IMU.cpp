@@ -17,7 +17,7 @@ Step counter initial implementation
 #include <Arduino.h>
 
 LSM9DS1 lsm;
-
+IMU imu;
 
 
 
