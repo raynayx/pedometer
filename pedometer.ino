@@ -13,10 +13,7 @@ pedometer glue
 */
 // #include <avr/sleep.h>
 #include "UI.h"
-// #include "IMU.h"
-// #include "filter.h"
-// #include "parser.h"
-#include "pipeline.h"
+//#include "pipeline.h"
 
 #define timeoutDelay 20000
 #define TEST_ASA
@@ -61,14 +58,14 @@ int debounceDelay = 50;
 //  sleep_cpu();
 //}
 
-// IMU imu;
+// IMU myImu1;
 void setup()
 {
     Serial.begin(115200);
 //    pinMode(testPinA0,OUTPUT);
     pinMode(navBtn,INPUT_PULLUP);
     pinMode(selBtn,INPUT_PULLUP);
-    // imu.setupSensor();
+     imu.setupSensor();
     // imu.configureLSM9DS1Interrupts();
 //    setupScreen();
 //    welcomeScreen();   
@@ -139,10 +136,11 @@ void loop()
 
 // }
 //digitalWrite(testPinA0,HIGH);
-
+Serial.println("go");
 #ifdef TEST_ASA 
 int a = countSteps();
 Serial.println(a);
+imu.printAccel();
 delay(1000);
 #endif
   

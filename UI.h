@@ -22,6 +22,8 @@
 #include <SFE_MicroOLED.h>  //OLED Screen library 
 #include <Arduino.h>
 
+#include "pipeline.h"
+
 
 
 enum class menuItem {steps,rawData,off};

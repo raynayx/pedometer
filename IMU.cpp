@@ -15,23 +15,23 @@ Step counter initial implementation
 #include "IMU.h"
 #include <Wire.h>
 #include <Arduino.h>
-#include <SparkFunLSM9DS1.h> 
 
-LSM9DS1 imu;
+LSM9DS1 lsm;
+
 
 
 
 axesArr IMU::xlValues()
 {
   axesArr vals;
-  if(imu.accelAvailable())
+  if(lsm.accelAvailable())
   {
     for(int i = 0; i < 50; i++)
     {
-      imu.readAccel();
-      vals.arr[i].x = imu.calcAccel(imu.ax);
-      vals.arr[i].y = imu.calcAccel(imu.ay);
-      vals.arr[i].z = imu.calcAccel(imu.az);
+      lsm.readAccel();
+      vals.arr[i].x = lsm.calcAccel(lsm.ax);
+      vals.arr[i].y = lsm.calcAccel(lsm.ay);
+      vals.arr[i].z = lsm.calcAccel(lsm.az);
     }
   }
   else
@@ -46,25 +46,25 @@ void IMU::setupSensor()
 //   pinMode(intPin,INPUT_PULLUP);
    Wire.begin();
 
-  if (!imu.begin() ) // with no arguments, this uses default addresses (AG:0x6B, M:0x1E) and i2c port (Wire).
+  if (!lsm.begin() ) // with no arguments, this uses default addresses (AG:0x6B, M:0x1E) and i2c port (Wire).
   {
     Serial.println(F("Failed to communicate with LSM9DS1."));
     Serial.println(F("Double-check wiring."));
     while (1);
   }
 //  Wire.setClock(400000);
-  imu.settings.gyro.enabled = false;
-  imu.settings.mag.enabled = false;
+  lsm.settings.gyro.enabled = false;
+  lsm.settings.mag.enabled = false;
   
-  imu.settings.accel.scale = 2;
+  lsm.settings.accel.scale = 2;
   // SAMPLE RATE SETTINGS
   // 1 = 10 Hz    4 = 238 Hz
   // 2 = 50 Hz    5 = 476 Hz
   // 3 = 119 Hz   6 = 952 Hz
-  imu.settings.accel.sampleRate = 2;
+  lsm.settings.accel.sampleRate = 2;
 
   
-  imu.begin();
+  lsm.begin();
   
 }
 
@@ -78,14 +78,14 @@ axes temp = {0,0,0};
 axes delta;
 
   
- if (imu.accelAvailable())
+ if (lsm.accelAvailable())
   {
       for(int i = 0; i < 4; i++)
       { 
-      imu.readAccel();
-      reading.x += abs(imu.calcAccel(imu.ax));
-      reading.y += abs(imu.calcAccel(imu.ay));
-      reading.z += abs(imu.calcAccel(imu.az));
+      lsm.readAccel();
+      reading.x += abs(lsm.calcAccel(lsm.ax));
+      reading.y += abs(lsm.calcAccel(lsm.ay));
+      reading.z += abs(lsm.calcAccel(lsm.az));
       interval++;
       }
       interval = interval >= 100 ? 0: interval;
@@ -203,13 +203,13 @@ axes IMU::printAccel()
   Serial.print(F("A: "));
 
 #ifdef PRINT_CALCULATED
-  if ( imu.accelAvailable() )
+  if ( lsm.accelAvailable() )
   {
-    imu.readAccel();
+    lsm.readAccel();
   }
-  a.x = imu.calcAccel(imu.ax);
-  a.y = imu.calcAccel(imu.ay);
-  a.z = imu.calcAccel(imu.az);
+  a.x = lsm.calcAccel(lsm.ax);
+  a.y = lsm.calcAccel(lsm.ay);
+  a.z = lsm.calcAccel(lsm.az);
   
 //  Serial.print(a.x);
 //  Serial.print(", ");
@@ -220,15 +220,15 @@ axes IMU::printAccel()
 
   
 #elif defined PRINT_RAW
-if ( imu.accelAvailable() )
+if ( lsm.accelAvailable() )
   {
-    imu.readAccel();
+    lsm.readAccel();
   }
-  Serial.print(imu.ax);
+  Serial.print(lsm.ax);
   Serial.print(", ");
-  Serial.print(imu.ay);
+  Serial.print(lsm.ay);
   Serial.print(", ");
-  Serial.println(imu.az);
+  Serial.println(lsm.az);
 
 
 #endif

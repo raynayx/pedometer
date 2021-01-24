@@ -1,6 +1,4 @@
 #include "UI.h"
-#include "IMU.h"
-#include "pipeline.h"
 
 // OLED over SPI
 #define PIN_RESET 9  //4 
@@ -12,7 +10,6 @@ MicroOLED oled(PIN_RESET, PIN_DC, PIN_CS);
 menuItem selection = menuItem::steps;           //home menu options
 page currentPage = page::home;                  //page selected
 
-IMU myImu;
 
 void setupScreen()
 {
@@ -150,7 +147,7 @@ void switchPage()
       {
         // switch to steps page
         currentPage = page::steps;
-        stepsPage(myImu.countStep());
+        stepsPage(imu.countStep());
         
       }
       else if(selection == menuItem::rawData)
@@ -175,7 +172,7 @@ void switchPage()
   if (currentPage == page::rawData)
   {
     // a = imu.printAccel();
-    a = myImu.xlValues();
+    a = imu.xlValues();
 
     for(int i=0; i < 50; i++)
     {

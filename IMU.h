@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include <Arduino.h>
+#include <SparkFunLSM9DS1.h> 
 
 
 
