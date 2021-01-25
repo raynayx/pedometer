@@ -13,7 +13,7 @@ pedometer glue
 */
 // #include <avr/sleep.h>
 #include "UI.h"
-//#include "pipeline.h"
+
 
 #define timeoutDelay 20000
 #define TEST_ASA
