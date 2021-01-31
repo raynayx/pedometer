@@ -12,7 +12,7 @@ int countSteps()
 {
 axesArr imuData;
 Serial.println("FC");
-// dummy IMU data
+//IMU data
 for(int i=0;i<50;i++)
 {
    if (lsm.accelAvailable())
@@ -40,6 +40,7 @@ oneDArr processed = processor.run();
 //call analyzer to count steps
 Analyzer analyzer(processed);
 int totalSteps = analyzer.measure_steps();
-
+Serial.print("IN PIPELINE STEPS=");
+Serial.println(totalSteps);
 return totalSteps;
 }
