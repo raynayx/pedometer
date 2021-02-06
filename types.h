@@ -4,8 +4,8 @@
 
 struct COEFFICIENTS
 {
-    float alpha[3];
-    float beta[3];
+    double alpha[3];
+    double beta[3];
 };
 struct axes
 {
