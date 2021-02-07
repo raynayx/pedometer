@@ -26,5 +26,5 @@ struct parsedAxesArr
 
 struct oneDArr
 {
-    float oneDArr[50];
+    double oneDArr[50];
 };

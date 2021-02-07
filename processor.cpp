@@ -33,6 +33,16 @@ oneDArr Processor::filter()
 {
     // take out low freq
     filtered_data = f.low_0_hz(dproduct);
+
+     #ifdef VERIFY
+    for(int i=0;i<50;i++)
+    {
+      Serial.print("filtered 1D(LOW FREQ)\t");
+      Serial.println(filtered_data.oneDArr[i]);
+    }
+
+    #endif
+    
     // take out high freq
     filtered_data = f.high_1_hz(filtered_data);
     

@@ -49,12 +49,19 @@ Parser parser(imuData);
 parsedAxesArr pAxesArr = parser.run();
 for(int i=0;i<50;i++)
 {
-  Serial.print("parsed: \t");
-Serial.print(pAxesArr.uArr[i].x);
+  Serial.print("parsed(G): \t");
+Serial.print(pAxesArr.gArr[i].x);
 Serial.print("\t");
 Serial.print(pAxesArr.gArr[i].y);
 Serial.print("\t");
 Serial.println(pAxesArr.gArr[i].z);
+
+  Serial.print("parsed(U): \t");
+Serial.print(pAxesArr.uArr[i].x);
+Serial.print("\t");
+Serial.print(pAxesArr.uArr[i].y);
+Serial.print("\t");
+Serial.println(pAxesArr.uArr[i].z);
 }
 // process from 3d into 1d
 Processor processor(pAxesArr);
