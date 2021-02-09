@@ -42,7 +42,6 @@ axesArr Filter::filter(axesArr &data,COEFFICIENTS &coefficients)
     filtered_data.arr[0]={0.0,0.0,0.0};
     filtered_data.arr[1]={0.0,0.0,0.0};
 
-//    data.arr[1].x;
 
     for(int i = 2; i < 50; i++)
     {

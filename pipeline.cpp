@@ -14,9 +14,7 @@ int countSteps()
 {
 axesArr imuData;
 //IMU data
-//for(int i=0;i<50;i++)
-//{
-   if (lsm.accelAvailable())
+ if (lsm.accelAvailable())
   {
   lsm.readAccel();
   axes temp;
@@ -26,25 +24,23 @@ axesArr imuData;
   temp.z = lsm.calcAccel(lsm.az);
   
   buffer.push(temp);
-
   
-//  }
 }
 for(int i = 0; i < 50; i++)
 {
 
   imuData.arr[i] = {buffer[i].x,buffer[i].y,buffer[i].z};
 
-//  #ifdef VERIFY
-//  Serial.print("data num:\t");
-//  Serial.print(i);
-//  Serial.print("\t");
-//  Serial.print(imuData.arr[i].x);
-//  Serial.print("\t");
-//  Serial.print(imuData.arr[i].y);
-//  Serial.print("\t");
-//  Serial.println(imuData.arr[i].z);
-//  #endif
+ #ifdef VERIFY
+ Serial.print("data num:\t");
+ Serial.print(i);
+ Serial.print("\t");
+ Serial.print(imuData.arr[i].x);
+ Serial.print("\t");
+ Serial.print(imuData.arr[i].y);
+ Serial.print("\t");
+ Serial.println(imuData.arr[i].z);
+ #endif
 }
 
 // parse data from mixed into user xl and gravity xl
@@ -72,12 +68,16 @@ Serial.println(pAxesArr.uArr[i].z);
 // process from 3d into 1d
 Processor processor(pAxesArr);
 oneDArr processed = processor.run();
+
+#ifdef VERIFY
 for(int i=0;i<50;i++)
 {
   Serial.print("One D: \t");
   Serial.println(processed.oneDArr[i]);
 
 }
+#endif
+
 //call analyzer to count steps
 Analyzer analyzer(processed);
 int totalSteps = analyzer.measure_steps();
