@@ -1,68 +1,54 @@
 #include "processor.h"
 #include "filter.h"
-#include "types.h"
-#include <Arduino.h>
+#define DEBUG
 
-#define VERIFY
-Filter f;
-Processor::Processor(struct parsedAxesArr pdata)
+double* Processor::dotProduct()
 {
-    parsedData = pdata;
-}
-
-oneDArr Processor::dot_product()
-{
-     
-    for(int i = 0; i < 50; i++)
+    double result[maxSize];
+    for(int i=0; i < maxSize; i++)
     {
-        dproduct.oneDArr[i] =
-        parsedData.uArr[i].x * parsedData.gArr[i].x +
-        parsedData.uArr[i].y * parsedData.gArr[i].y +
-        parsedData.uArr[i].z * parsedData.gArr[i].z;
+      result[i] =
+      filteredArray_G[i].x * filteredArray_U[i].x +
+      filteredArray_G[i].y * filteredArray_U[i].y +
+      filteredArray_G[i].z * filteredArray_U[i].z;
 
-        #ifdef VERIFY
+      #ifdef DEBUG
         Serial.print("dot product \t");
-        Serial.println(dproduct.oneDArr[i]);
-        #endif
+        Serial.println(result[i]);
+      #endif
+
+      
     }
-    return dproduct;
-    
+    return result;
 }
 
-oneDArr Processor::filter()
+double* Processor::filter()
 {
-    // take out low freq
-    filtered_data = f.low_0_hz(dproduct);
+    Filter fp;
+    double* dp = dotProduct();
 
-     #ifdef VERIFY
-    for(int i=0;i<50;i++)
-    {
-      Serial.print("filtered 1D(LOW FREQ)\t");
-      Serial.println(filtered_data.oneDArr[i]);
-    }
+    //take out low freq
+    double* filteredD = fp.low_0_hz(dp);
 
+    #ifdef DEBUG
+      for(int i = 0; i < maxSize; i++)
+      {
+          Serial.print("filtered 1D(LOW_0)\t");
+          Serial.println(filteredD[i]);
+      }
     #endif
-    
-    // take out high freq
-    filtered_data = f.high_1_hz(filtered_data);
-    
-    #ifdef VERIFY
-    for(int i=0;i<50;i++)
-    {
-      Serial.print("filtered 1D\t");
-      Serial.println(filtered_data.oneDArr[i]);
-    }
 
+    //take out high freq
+    filteredD = fp.high_1_hz(filteredD);
+
+    #ifdef DEBUG
+      for(int i=0; i < maxSize; i++)
+      {
+        Serial.print("filtered 1D(HIGH_1)\t");
+        Serial.println(filteredD[i]);
+      }
     #endif
-    
-    return filtered_data;
 
-}
+    return filteredD;
 
-oneDArr Processor::run()
-{
-    // find dot product
-    dot_product();
-    return filter();
-    // filter in 1D
 }

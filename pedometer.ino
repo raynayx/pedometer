@@ -12,7 +12,8 @@ pedometer glue
 
 */
 // #include <avr/sleep.h>
-#include "UI.h"
+// #include "UI.h"
+#include "pipeline.h"
 
 
 #define timeoutDelay 20000
@@ -62,6 +63,7 @@ int debounceDelay = 50;
 void setup()
 {
     Serial.begin(115200);
+    pinMode(LED_BUILTIN,OUTPUT);
 //    pinMode(testPinA0,OUTPUT);
     pinMode(navBtn,INPUT_PULLUP);
     pinMode(selBtn,INPUT_PULLUP);
@@ -136,11 +138,12 @@ void loop()
 
 // }
 //digitalWrite(testPinA0,HIGH);
-#ifdef TEST_ASA 
-int a = countSteps();
-Serial.println(a);
-//imu.printAccel();
-delay(1000);
-#endif
-  
+    digitalWrite(LED_BUILTIN,!digitalRead(LED_BUILTIN));
+    delay(500);
+    countSteps();
+
+    #ifdef DEBUG
+        Serial.print(F("Steps[CountSteps]\t"));
+        Serial.println(steps);
+    #endif
 }

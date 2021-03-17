@@ -14,3 +14,7 @@
         
 
 
+ March 06,2021
+ - Rewrite the filter function to use the Circular Buffer
+    - Rewriting the filter function with a Circular Buffer caused accumulating values eventually leading to overflows
+    - Hence, the circular Buffer will be limited to the Source of the IMU data and the subsquent will be plain old array

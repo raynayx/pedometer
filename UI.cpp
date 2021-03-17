@@ -147,7 +147,7 @@ void switchPage()
       {
         // switch to steps page
         currentPage = page::steps;
-        stepsPage(imu.countStep());
+        stepsPage(steps);
         
       }
       else if(selection == menuItem::rawData)
@@ -168,20 +168,20 @@ void switchPage()
 }
  void refreshPage()
 {
-    axesArr a;
+    // axesArr a;
   if (currentPage == page::rawData)
   {
     // a = imu.printAccel();
-    a = imu.xlValues();
+    // a = imu.xlValues();
 
-    for(int i=0; i < 50; i++)
-    {
-      rawDataPage(a.arr[i].x,a.arr[i].y,a.arr[i].z);
-      Serial.println(F("page being refreshed"));
-      Serial.print(a.arr[i].x);
-      Serial.print(a.arr[i].y);
-      Serial.print(a.arr[i].z);
-    }
+    // for(int i=0; i < 50; i++)
+    // {
+    //   rawDataPage(a.arr[i].x,a.arr[i].y,a.arr[i].z);
+    //   Serial.println(F("page being refreshed"));
+    //   Serial.print(a.arr[i].x);
+    //   Serial.print(a.arr[i].y);
+    //   Serial.print(a.arr[i].z);
+    // }
     
   }
   if (currentPage == page::steps)

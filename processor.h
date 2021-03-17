@@ -1,19 +1,30 @@
-#pragma once
+
+
+#ifndef PROCESSOR_H_
+#define PROCESSOR_H_
+
 #include "types.h"
+
 
 class Processor
 {
     public:
-        oneDArr dproduct;
-        oneDArr filtered_data;
-        parsedAxesArr parsedData;
-        Processor(parsedAxesArr pdata);
-        oneDArr run();
-
+        // convert to one dimension, uXl*gXl
+        double* dotProduct();
+        double* filter();
     private:
-        // dot_product of all the axes
-        oneDArr dot_product();
-        // filter the 1D data from the dot_product 
-        oneDArr filter();
 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+#endif

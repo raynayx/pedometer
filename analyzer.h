@@ -1,15 +1,19 @@
-#pragma once
+#ifndef ANALYZER_H_
+#define ANALYZER_H_
+
 #include "types.h"
+
 
 class Analyzer
 {
     public:
-        float THRESHOLD = 0.09;
-        struct oneDArr data;
-        
-        Analyzer(struct oneDArr d);
-        int measure_steps();
+      double* data;
 
-    private:
-        int steps;
+      Analyzer (double* d);
+      void measureSteps();  
 };
+
+
+
+
+#endif

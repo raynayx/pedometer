@@ -1,35 +1,42 @@
 #include "analyzer.h"
-#include "types.h"
+// #define DEBUG
 
-Analyzer::Analyzer(struct oneDArr d)
+Analyzer::Analyzer(double* d)
 {
     data = d;
 }
 
-
-int Analyzer::measure_steps()
+unsigned long steps = 0;
+void Analyzer::measureSteps()
 {
-    steps = 0;
+    int lsteps = 0;  //number of steps for each set
     bool count_steps = true;
 
-    for(int i = 0; i < 50; i++)
+    for(int i = 0; i < maxSize; i++)
     {
-        if (i != 0)
+        if(i != 0)
         {
-            if((data.oneDArr[i] >= THRESHOLD) && (data.oneDArr[i-1] < THRESHOLD))
+            if((data[i] >= THRESHOLD) && (data[i-1] < THRESHOLD))
             {
-                //next unless count_steps #####****####
+                // next unless count_steps 
                 if(!count_steps)
                     continue;
-                steps++;
+
+                lsteps++;
                 count_steps = false;
             }
-            if((data.oneDArr[i] < 0) && (data.oneDArr[i-1] >= 0))
+            if((data[i] < 0) && (data[i-1] >= 0))
                 count_steps = true;
-        }
 
+        } 
         
+            
+            #ifdef DEBUG
+                Serial.print("lSteps\t");
+                Serial.print(lsteps);
+                Serial.print("\tSTEPS\t");
+                Serial.println(steps);
+            #endif
     }
-
-    return steps;
+     steps += lsteps;    //add current result to all previous  
 }

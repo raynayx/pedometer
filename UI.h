@@ -20,11 +20,7 @@
 #pragma once
 #include <SPI.h> 
 #include <SFE_MicroOLED.h>  //OLED Screen library 
-#include <Arduino.h>
-
 #include "pipeline.h"
-
-
 
 enum class menuItem {steps,rawData,off};
 enum class page {home,steps,rawData};

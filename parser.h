@@ -1,16 +1,15 @@
-#pragma once
+#ifndef PARSER_H_
+#define PARSER_H_
+
+
 #include "types.h"
+
 
 class Parser
 {
     public:
-        axesArr data;
-        parsedAxesArr parsed_data;
-
-        Parser(axesArr d);
-        parsedAxesArr run();
-
-    private:
-        parsedAxesArr parse();
-
+        void parse();
 };
+
+
+#endif
