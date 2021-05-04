@@ -1,13 +1,17 @@
 #include "pipeline.h"
 
 
-IMU imu;
+// IMU imu;
 //sequence leading to step counts
+
+IMU modelIMU;
 
 void countSteps()
 {   
     //get values from IMU into buffer
-    imu.fillCircularBuffer();
+    // imu.fillCircularBuffer();
+
+    modelIMU.fillCircularBuffer();
 
 
     //parser to condition

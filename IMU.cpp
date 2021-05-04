@@ -1,58 +1,58 @@
-#include "IMU.h"
+// #include "IMU.h"
 
-CB rawIMUData;        //raw data from IMU
-axes rawIMUDataArray[maxSize];                  // static array to store every maxSize set of IMU data
-void IMU::setupSensor()
-{
-    Wire.begin();
+// CB rawIMUData;        //raw data from IMU
+// axes rawIMUDataArray[maxSize];                  // static array to store every maxSize set of IMU data
+// void IMU::setupSensor()
+// {
+//     Wire.begin();
 
-  if (!lsm.begin() ) // with no arguments, this uses default addresses (AG:0x6B, M:0x1E) and i2c port (Wire).
-  {
-    Serial.println(F("Failed to communicate with LSM9DS1."));
-    Serial.println(F("Double-check wiring."));
-    while (1);
-  }
-//  Wire.setClock(400000);
-  lsm.settings.gyro.enabled = false;
-  lsm.settings.mag.enabled = false;
+//   if (!lsm.begin() ) // with no arguments, this uses default addresses (AG:0x6B, M:0x1E) and i2c port (Wire).
+//   {
+//     Serial.println(F("Failed to communicate with LSM9DS1."));
+//     Serial.println(F("Double-check wiring."));
+//     while (1);
+//   }
+// //  Wire.setClock(400000);
+//   lsm.settings.gyro.enabled = false;
+//   lsm.settings.mag.enabled = false;
   
-  lsm.settings.accel.scale = 2;
-  // SAMPLE RATE SETTINGS
-  // 1 = 10 Hz    4 = 238 Hz
-  // 2 = 50 Hz    5 = 476 Hz
-  // 3 = 119 Hz   6 = 952 Hz
-  lsm.settings.accel.sampleRate = 2;
+//   lsm.settings.accel.scale = 2;
+//   // SAMPLE RATE SETTINGS
+//   // 1 = 10 Hz    4 = 238 Hz
+//   // 2 = 50 Hz    5 = 476 Hz
+//   // 3 = 119 Hz   6 = 952 Hz
+//   lsm.settings.accel.sampleRate = 2;
 
   
-  lsm.begin();
-}
+//   lsm.begin();
+// }
 
 
-void IMU::fillCircularBuffer()
-{
-    #define X lsm.calcAccel(lsm.ax)
-    #define Y lsm.calcAccel(lsm.ay)
-    #define Z lsm.calcAccel(lsm.az)
+// void IMU::fillCircularBuffer()
+// {
+//     #define X lsm.calcAccel(lsm.ax)
+//     #define Y lsm.calcAccel(lsm.ay)
+//     #define Z lsm.calcAccel(lsm.az)
 
-    if(lsm.accelAvailable())
-    {
-        if(rawIMUData.isEmpty())
-        {
-            for(int i=0; i < maxSize; i++)
-            {
-                lsm.readAccel();
-                rawIMUData.push({X,Y,Z});
-            }
-        }
-        lsm.readAccel();
-        rawIMUData.push({X,Y,Z});
-    }
+//     if(lsm.accelAvailable())
+//     {
+//         if(rawIMUData.isEmpty())
+//         {
+//             for(int i=0; i < maxSize; i++)
+//             {
+//                 lsm.readAccel();
+//                 rawIMUData.push({X,Y,Z});
+//             }
+//         }
+//         lsm.readAccel();
+//         rawIMUData.push({X,Y,Z});
+//     }
 
-    // move current data set into static array 
-    for(int i=0; i < maxSize; i++)
-    {
-      rawIMUDataArray[i].x = rawIMUData[i].x;
-      rawIMUDataArray[i].y = rawIMUData[i].y;
-      rawIMUDataArray[i].z = rawIMUData[i].z;
-    }
-}
+//     // move current data set into static array 
+//     for(int i=0; i < maxSize; i++)
+//     {
+//       rawIMUDataArray[i].x = rawIMUData[i].x;
+//       rawIMUDataArray[i].y = rawIMUData[i].y;
+//       rawIMUDataArray[i].z = rawIMUData[i].z;
+//     }
+// }

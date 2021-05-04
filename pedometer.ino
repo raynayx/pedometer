@@ -67,7 +67,7 @@ void setup()
 //    pinMode(testPinA0,OUTPUT);
     pinMode(navBtn,INPUT_PULLUP);
     pinMode(selBtn,INPUT_PULLUP);
-     imu.setupSensor();
+    modelIMU.setupSensor();
     // imu.configureLSM9DS1Interrupts();
 //    setupScreen();
 //    welcomeScreen();   
