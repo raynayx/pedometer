@@ -7,8 +7,10 @@
 
 
 
-#define maxSize 50
+#define maxSize 30
 #define THRESHOLD 0.09
+
+#define TAB Serial.print(F("\t"))
 
 
 struct COEFFICIENTS

@@ -21,10 +21,14 @@ void countSteps()
 
     //processor to process
     Processor pro;
-    double* processed = pro.filter();
+    double dp[maxSize]; //dotproduct result from dotProduct()
+    double filteredD[maxSize]; 
+
+    pro.dotProduct(dp);
+    pro.filter(dp,filteredD);
 
     //analyzer to count steps
-    Analyzer analyzer(processed);
+    Analyzer analyzer(filteredD);
 
     analyzer.measureSteps();
 }

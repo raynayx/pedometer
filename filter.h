@@ -21,19 +21,21 @@ class Filter
         void high_1_hz(CB& data);
 
         //split xl into x_xl and g_xl
-        double* low_0_hz(double* data);
+        
+        void low_0_hz(double* data,double* filteredData);
 
         //low_5_hz(data)
-        double* low_5_hz(double* data);
+        
+        void low_5_hz(double* data,double* filteredData);
 
         //high_1_hz(data)
-        double* high_1_hz(double* data);
+        void high_1_hz(double* data,double* filteredData);
 
 
     private:
         //filter the axes data based on passed COEFFICIENTS;
         void filter(CB &data, COEFFICIENTS &coefficents);         //TODO : rewite to not use global variable
-        double* filter(double* data, COEFFICIENTS &coefficients);  
+        void filter(double* data, COEFFICIENTS &coefficients,double* filteredData); 
 };
 
 

@@ -1,10 +1,11 @@
 #include "processor.h"
 #include "filter.h"
-#define DEBUG
+// #define DEBUG
 
-double* Processor::dotProduct()
+
+
+void Processor::dotProduct(double* result)
 {
-    double result[maxSize];
     for(int i=0; i < maxSize; i++)
     {
       result[i] =
@@ -19,27 +20,29 @@ double* Processor::dotProduct()
 
       
     }
-    return result;
 }
 
-double* Processor::filter()
+
+
+//rewritten dotProduct filter  returns the filtered result
+void Processor::filter(double* dp, double* filteredD)
 {
     Filter fp;
-    double* dp = dotProduct();
 
     //take out low freq
-    double* filteredD = fp.low_0_hz(dp);
+    double filteredD_L[maxSize];
+    fp.low_0_hz(dp,filteredD_L);
 
     #ifdef DEBUG
       for(int i = 0; i < maxSize; i++)
       {
           Serial.print("filtered 1D(LOW_0)\t");
-          Serial.println(filteredD[i]);
+          Serial.println(filteredD_L[i]);
       }
     #endif
 
     //take out high freq
-    filteredD = fp.high_1_hz(filteredD);
+    fp.high_1_hz(filteredD_L,filteredD);
 
     #ifdef DEBUG
       for(int i=0; i < maxSize; i++)
@@ -48,7 +51,5 @@ double* Processor::filter()
         Serial.println(filteredD[i]);
       }
     #endif
-
-    return filteredD;
 
 }

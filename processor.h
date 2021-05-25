@@ -10,8 +10,8 @@ class Processor
 {
     public:
         // convert to one dimension, uXl*gXl
-        double* dotProduct();
-        double* filter();
+        void dotProduct(double* result);
+        void filter(double* dp, double* filteredD);
     private:
 
 };
